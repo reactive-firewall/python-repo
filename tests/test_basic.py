@@ -27,7 +27,7 @@ class BasicTestSuite(unittest.TestCase):
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test. Because it only matters if we're not mad as hatters."""
 		assert True
-	
+
 	def test_meta_test(self):
 		"""Insanity Test for unittests assertion."""
 		self.assertTrue(True)
@@ -71,6 +71,8 @@ class BasicTestSuite(unittest.TestCase):
 		theResult = False
 		try:
 			from .context import pythonrepo
+			if pythonrepo.__name__ is None:
+				theResult = False
 			from pythonrepo import pythonrepo as pythonrepo
 			self.assertIsNone(pythonrepo.useTool(None))
 			self.assertIsNone(pythonrepo.useTool("JunkInput"))
@@ -83,7 +85,7 @@ class BasicTestSuite(unittest.TestCase):
 		"""Try adding new tests."""
 		self.assertIsNone(None)
 		# define new tests below
-	
+
 	@unittest.skipUnless(sys.platform.startswith("linux"), "This test example requires linux")
 	def test_this_linux_only(self):
 		"""Linux is the test."""

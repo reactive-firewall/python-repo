@@ -210,11 +210,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str(err))
 				print(str((err.args)))
 				print(str(""))
-				othererr = None
-				del othererr
+				err = None
+				del err
 				theResult = False
 		assert theResult
-	
+
 	def test_profile_template_case(self):
 		"""Test case template for profiling"""
 		theResult = False
@@ -260,8 +260,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str(err))
 				print(str((err.args)))
 				print(str(""))
-				othererr = None
-				del othererr
+				err = None
+				del err
 				theResult = False
 		assert theResult
 
@@ -311,8 +311,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str(err))
 				print(str((err.args)))
 				print(str(""))
-				othererr = None
-				del othererr
+				err = None
+				del err
 				theResult = False
 		assert theResult
 
@@ -362,8 +362,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str(err))
 				print(str((err.args)))
 				print(str(""))
-				othererr = None
-				del othererr
+				err = None
+				del err
 				theResult = False
 		assert theResult
 

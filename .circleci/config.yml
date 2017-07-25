@@ -1,0 +1,20 @@
+version: 2
+jobs:
+  build:
+    working_directory: ~/
+    docker:
+      - image: circleci/python:3.6.1
+        environment:
+          CI: cicleci
+    steps:
+      - checkout
+      - run:
+          command: |
+            make clean
+      - run:
+          command: |
+            make test
+      - run:
+          command: |
+            make clean
+destination: tr1

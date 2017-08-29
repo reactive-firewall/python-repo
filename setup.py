@@ -59,7 +59,7 @@ except Exception:
 
 setup(
 	name="""pythonrepo""",
-	version="""1.0.0""",
+	version="""1.0.1""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

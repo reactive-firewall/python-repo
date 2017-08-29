@@ -17,8 +17,8 @@
 # limitations under the License.
 
 
-__version__ = """1.0.0"""
-
+__version__ = """1.0.1"""
+"""This is version 1.0.1 of pythonrepo Template"""
 
 try:
 	import sys
@@ -31,7 +31,7 @@ except Exception as ImportErr:
 	print(str((ImportErr.args)))
 	ImportErr = None
 	del ImportErr
-	raise ImportError(str("PythonRepo Failed to Import"))
+	raise ImportError(str("pythonrepo Failed to Import"))
 
 
 try:

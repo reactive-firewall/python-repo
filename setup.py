@@ -24,23 +24,25 @@ try:
 except Exception:
 	raise ImportError("""Not Implemented.""")
 
+
+def readFile(filename="""./README.md"""):
+	theResult = None
+	try:
+		with open(str("""./{}""").format(str(filename))) as f:
+			theResult = f.read()
+	except Exception:
+		theResult = str(
+			"""See https://github.com/reactive-firewall/python-repo/{}"""
+		).format(filename)
+	return theResult
+
 try:
-	with open("""./requirements.txt""") as f:
-		requirements = f.read().splitlines()
+	requirements = readFile("""requirements.txt""").splitlines()
 except Exception:
 	requirements = None
 
-try:
-	with open("""./README.md""") as f:
-		readme = f.read()
-except Exception:
-	readme = str("""See https://github.com/reactive-firewall/python-repo/README.md""")
-
-try:
-	with open("""./LICENSE.md""") as f:
-		license = f.read()
-except Exception:
-	license = str("""See https://github.com/reactive-firewall/python-repo/LICENSE.md""")
+readme = readFile("""README.md""")
+license = readFile("""LICENSE.md""")
 
 try:
 	class_tags = [
@@ -70,4 +72,3 @@ setup(
 	license=license,
 	packages=find_packages(exclude=("""tests""", """docs""")),
 )
-

@@ -36,8 +36,10 @@ def readFile(filename="""./README.md"""):
 		).format(filename)
 	return theResult
 
+
 try:
-	requirements = readFile("""requirements.txt""").splitlines()
+	with open("""./requirements.txt""") as f:
+		requirements = f.read().splitlines()
 except Exception:
 	requirements = None
 

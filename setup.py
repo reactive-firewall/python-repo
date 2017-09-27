@@ -51,6 +51,7 @@ try:
 		str("""Development Status :: 4 - Beta"""),
 		str("""Operating System :: POSIX :: Linux"""),
 		str("""Programming Language :: Python"""),
+		str("""Programming Language :: Python :: 3.7"""),
 		str("""Programming Language :: Python :: 3.6"""),
 		str("""Programming Language :: Python :: 3.5"""),
 		str("""Programming Language :: Python :: 3.4"""),
@@ -63,7 +64,7 @@ except Exception:
 
 setup(
 	name="""pythonrepo""",
-	version="""1.0.1""",
+	version="""1.0.2""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

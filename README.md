@@ -3,13 +3,22 @@ This repo is basically my template for new repos/projects
 
 # CI Template:
 
-By default this template will assume that the Travis CI Service is used for CI/CD
+By default this template will assume that the Travis CI Service and Circle-CI Service are used for CI/CD
 
 # Status
 
 ### master:
 [![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=master)](https://travis-ci.org/reactive-firewall/python-repo)
+[![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/master)
+[![Python 3](https://pyup.io/repos/github/reactive-firewall/python-repo/python-3-shield.svg)](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/)
+[![Updates](https://pyup.io/repos/github/reactive-firewall/python-repo/shield.svg)](https://pyup.io/repos/github/reactive-firewall/python-repo/)
+[![Dependency Status](https://gemnasium.com/badges/github.com/reactive-firewall/python-repo.svg)](https://gemnasium.com/github.com/reactive-firewall/python-repo)
+[![Dependency Status](https://www.versioneye.com/user/projects/??/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/??)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/master/)
+[![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/python-repo/badge.svg?branch=master)](https://coveralls.io/github/reactive-firewall/python-repo?branch=master)
+[![coverity](https://scan.coverity.com/projects/13847/badge.svg)](https://scan.coverity.com/projects/reactive-firewall-python-repo)
+![commits-since](https://img.shields.io/github/commits-since/reactive-firewall/python-repo/stable.svg?maxAge=9000)
+[![Code Climate](https://codeclimate.com/github/reactive-firewall/python-repo/badges/gpa.svg)](https://codeclimate.com/github/reactive-firewall/python-repo)
 
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=stable)](https://travis-ci.org/reactive-firewall/python-repo)
@@ -51,27 +60,14 @@ make test-tox ; # runs the tox tests
 make clean ; # cleans up for next test
 ```
 
-# License - MIT
+# Next steps:
 
-## Copyright (c) 2017 Mr. Walls
-### 
-### THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-### IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-### FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-### AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-### LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-### OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-### SOFTWARE.
-###
-### Permission is hereby granted, free of charge, to any person obtaining a copy
-### of this software and associated documentation files (the "Software"), to deal
-### in the Software without restriction, including without limitation the rights
-### to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-### copies of the Software, and to permit persons to whom the Software is
-### furnished to do so, subject to the following conditions:
-###
-### The above copyright notice and this permission notice shall be included in all
-### copies or substantial portions of the Software.
+Like automation? Then integrate away, this template can take it!
+(hint: @travis-ci, @houndci-bot, @pyup-bot, @stickler-ci, @circleci, @codecov-io, @coverallsapp, CodeClimate)
 
-## USE AT OWN RISK.
+Not in a rush? Then be sure to edit the badges in the README.
+(hint: `sed -e 's/python-repo/MY-NEW-REPO' ./README.md`)
+
+
+[![License - MIT](https://img.shields.io/github/license/reactive-firewall/PiAP-python-tools.svg?maxAge=2592000)](https://github.com/reactive-firewall/python-repo/blob/stable/LICENSE.md)
 

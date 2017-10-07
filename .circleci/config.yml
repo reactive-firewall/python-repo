@@ -9,11 +9,6 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
           SHELL: /bin/bash
     steps:
-      - run:
-        shell: /bin/bash
-        name: "install git"
-        command: |
-          sudo apt-get -y install git || true
       - checkout
       - run:
           shell: /bin/bash

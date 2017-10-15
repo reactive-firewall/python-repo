@@ -2,10 +2,10 @@ coverage:
   status:
     project:
       default: on
-        target: 80%
+        target: 95%
         base: auto
       tests:
-        target: 50%
+        target: 80%
         flags: tests
         paths:
           - tests

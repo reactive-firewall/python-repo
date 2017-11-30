@@ -6,14 +6,13 @@ branches:
     - stable
     - master
 
+env:
+
 matrix:
   include:
   - os: linux
     python:  "2.7"
     dist: trusty
-  - os: linux
-    python:  "2.7"
-    dist: precice
   - os: linux
     python:  "3.3"
   - os: linux
@@ -21,9 +20,6 @@ matrix:
   - os: linux
     python:  "3.5"
     dist: trusty
-  - os: linux
-    python:  "3.5"
-    dist: precice
   - os: linux
     python:  "3.6"
   - os: linux
@@ -38,10 +34,7 @@ matrix:
   - os: linux
     python:  "pypy-5.3.1"
   - os: linux
-    python:  "nightly" # currently points to 3.6-dev
-  - os: osx
-    osx_image: xcode6.4
-    language: generic
+    python:  "nightly" # currently points to 3.7-dev
   - os: osx
     osx_image: xcode7.2
     language: generic
@@ -69,6 +62,10 @@ matrix:
     python:  "pypy3"
   - os: linux
     python:  "pypy-5.3.1"
+  - os: osx
+  - os: osx
+    osx_image: xcode6.4
+    language: generic
 
 install:  "make init"
 
@@ -112,6 +109,11 @@ before_install:
 #  - travis_retry pip uninstall -y python-coveralls || travis_retry python3 -m pip uninstall -y python-coveralls || true
 #  - travis_retry pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
 
+before_script:
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else curl -L --url https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 -o ./cc-test-reporter 3>/dev/null 2>/dev/null || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else chmod +x ./cc-test-reporter || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter before-build || true ; fi ;
+
 script:
   - make clean ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP make test" ; else make test || exit $? ; fi ;
@@ -124,8 +126,14 @@ script:
 
 after_success:
   - coverage combine || true
+  - coverage xml || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
   - codecov || true
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true
-  - travis_retry python -m pip uninstall -y PyYAML || travis_retry python3 -m pip uninstall -y PyYAML || true
+  - travis_wait 25 curl --url "https://scan.coverity.com/download/linux64?token=${COVERTY_TOKEN}&project=reactive-firewall%2Fpython-repo" -o coverity_tool.tgz || true
+  - travis_wait tar xzf coverity_tool.tgz || true
+  - rm -fr cov-int || true
+  - cov-build --dir cov-int ./ || true
+  - curl --form token=${COVERTY_TOKEN} --form email=${RF_EMAIL} --form file=@./coverty.tar.gz --form version=1.0 --form description="Python Repo - (Travis CI Build)" https://scan.coverity.com/builds?project=reactive-firewall%2Fpython-repo || true
 

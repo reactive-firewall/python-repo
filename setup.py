@@ -46,30 +46,14 @@ except Exception:
 readme = readFile("""README.md""")
 license = readFile("""LICENSE.md""")
 
-try:
-	class_tags = [
-		str("""Development Status :: 4 - Beta"""),
-		str("""Operating System :: POSIX :: Linux"""),
-		str("""Programming Language :: Python"""),
-		str("""Programming Language :: Python :: 3.6"""),
-		str("""Programming Language :: Python :: 3.5"""),
-		str("""Programming Language :: Python :: 3.4"""),
-		str("""Programming Language :: Python :: 3.3"""),
-		str("""Programming Language :: Python :: 2.7"""),
-		str("""Topic :: Security""")
-	]
-except Exception:
-	class_tags = str("""Development Status :: 4 - Beta""")
-
 setup(
 	name="""pythonrepo""",
-	version="""1.0.1""",
+	version="""1.0.2""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,
 	author="""reactive-firewall""",
 	author_email="""reactive-firewall@users.noreply.github.com""",
-	classifiers=class_tags,
 	url="""https://github.com/reactive-firewall/python-repo.git""",
 	license=license,
 	packages=find_packages(exclude=("""tests""", """docs""")),

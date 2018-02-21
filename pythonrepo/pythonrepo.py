@@ -113,8 +113,8 @@ def useTool(tool, arguments=[None]):
 			TASK_OPTIONS[tool](arguments)
 		except Exception:
 			print(str(
-					"WARNING - An error occured while" +
-					"handling the shell. Cascading failure."
+				"WARNING - An error occured while" +
+				"handling the shell. Cascading failure."
 			))
 	else:
 		return None

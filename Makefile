@@ -85,7 +85,7 @@ test: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
-	$(QUIET)tox -v --
+	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup

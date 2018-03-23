@@ -17,6 +17,10 @@ init:
 
     choco install make
 
+    make /help
+
+    dir
+
     make init
 build_script:
 - cmd: make clean

@@ -10,6 +10,7 @@ By default this template will assume that the Travis CI Service and Circle-CI Se
 ### master:
 [![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=master)](https://travis-ci.org/reactive-firewall/python-repo)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/master)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/6gggp1wpbnnjokm4/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/python-repo/branch/master)
 [![Python 3](https://pyup.io/repos/github/reactive-firewall/python-repo/python-3-shield.svg)](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/)
 [![Updates](https://pyup.io/repos/github/reactive-firewall/python-repo/shield.svg)](https://pyup.io/repos/github/reactive-firewall/python-repo/)
 [![Dependency Status](https://gemnasium.com/badges/github.com/reactive-firewall/python-repo.svg)](https://gemnasium.com/github.com/reactive-firewall/python-repo)

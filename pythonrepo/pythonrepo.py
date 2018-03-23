@@ -109,21 +109,13 @@ def useTool(tool, arguments=[None]):
 		return None
 	if tool in TASK_OPTIONS.keys():
 		try:
-			try:
-				# print(str("launching: " + tool))
-				TASK_OPTIONS[tool](arguments)
-			except Exception:
-				print(str(
-					"WARNING - An error occured while" +
-					"handling the shell. Cascading failure."
-				))
+			# print(str("launching: " + tool))
+			TASK_OPTIONS[tool](arguments)
 		except Exception:
-			print(
-				str(
-					"CRITICAL - An error occured while handling " +
-					"the cascading failure."
-				)
-			)
+			print(str(
+				"WARNING - An error occured while" +
+				"handling the shell. Cascading failure."
+			))
 	else:
 		return None
 

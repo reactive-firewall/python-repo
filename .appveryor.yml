@@ -10,7 +10,12 @@ image:
 - Visual Studio 2015
 clone_depth: 50
 init:
-- cmd: make init
+- cmd: >-
+    choco search make
+    choco info make
+    choco install make
+
+    make init
 build_script:
 - cmd: make clean
 test_script:

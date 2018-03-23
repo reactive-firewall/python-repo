@@ -19,6 +19,12 @@ init:
 
     choco upgrade python --pre || VER>NUL
 
+    choco install flake8 || VER>NUL
+
+    choco install coverage || VER>NUL
+
+    choco install codecov || VER>NUL
+
     dir
 build_script:
 - cmd: make clean

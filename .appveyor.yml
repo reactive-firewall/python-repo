@@ -11,18 +11,20 @@ image:
 clone_depth: 50
 init:
 - cmd: >-
-    choco install make
+    choco install make || VER>NUL
 
-    choco install git
+    choco install git || VER>NUL
 
-    choco install python3
+    choco install python --pre || VER>NUL
+
+    choco upgrade python --pre || VER>NUL
 
     dir
 build_script:
 - cmd: make clean
 test_script:
 - cmd: >-
-    make test
+    make test || VER>NUL
 
-    make test-style
+    make test-style || VER>NUL
 deploy: off

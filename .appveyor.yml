@@ -33,4 +33,6 @@ test_script:
     make test || VER>NUL
 
     make test-style || VER>NUL
+
+    codecov || VER>NUL
 deploy: off

@@ -13,9 +13,11 @@ init:
 - cmd: >-
     choco install make
 
-    dir
+    choco install git
 
-    make init
+    choco install python3
+
+    dir
 build_script:
 - cmd: make clean
 test_script:

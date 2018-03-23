@@ -19,9 +19,9 @@ init:
 
     choco upgrade python --pre || VER>NUL
 
-    choco install flake8 || VER>NUL
+    python -m pip install flake8 || VER>NUL
 
-    choco install coverage || VER>NUL
+    python -m pip install coverage || VER>NUL
 
     choco install codecov || VER>NUL
 

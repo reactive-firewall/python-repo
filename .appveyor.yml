@@ -34,5 +34,9 @@ test_script:
 
     make test-style || VER>NUL
 
+    coverage combine || VER>NUL
+
+    coverage xml || VER>NUL
+
     codecov || VER>NUL
 deploy: off

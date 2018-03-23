@@ -11,13 +11,7 @@ image:
 clone_depth: 50
 init:
 - cmd: >-
-    choco search make
-
-    choco info make
-
     choco install make
-
-    make /help
 
     dir
 

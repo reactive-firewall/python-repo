@@ -3,6 +3,8 @@ sudo: false
 
 python:
 
+dist:
+
 branches:
   only:
     - stable
@@ -157,6 +159,13 @@ script:
   - make test-tox || exit $? ;
   - make clean ;
   - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true
+
+after_failure:
+  - coverage combine 2>/dev/null || true
+  - coverage xml 2>/dev/null || true
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
+  - codecov 2>/dev/null || true
+  - make clean 2>/dev/nul || true
 
 after_success:
   - coverage combine || true

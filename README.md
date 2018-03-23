@@ -15,6 +15,7 @@ By default this template will assume that the Travis CI Service and Circle-CI Se
 [![Updates](https://pyup.io/repos/github/reactive-firewall/python-repo/shield.svg)](https://pyup.io/repos/github/reactive-firewall/python-repo/)
 [![Dependency Status](https://gemnasium.com/badges/github.com/reactive-firewall/python-repo.svg)](https://gemnasium.com/github.com/reactive-firewall/python-repo)
 [![Dependency Status](https://www.versioneye.com/user/projects/59cc1dc1368b0831e6126dc6/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59cc1dc1368b0831e6126dc6)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/f76f4e7e2eae6bff9b6a/test_coverage)](https://codeclimate.com/github/reactive-firewall/python-repo/test_coverage)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/master/)
 [![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/python-repo/badge.svg?branch=master)](https://coveralls.io/github/reactive-firewall/python-repo?branch=master)
 [![coverity](https://scan.coverity.com/projects/13847/badge.svg)](https://scan.coverity.com/projects/reactive-firewall-python-repo)

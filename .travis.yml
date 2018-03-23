@@ -165,7 +165,7 @@ after_success:
   - codecov || true
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - coveralls 2>/dev/null || true
-  - travis_wait 25 curl --url "https://scan.coverity.com/download/linux64?token=${COVERTY_TOKEN}&project=reactive-firewall%2Fpython-repo" -o coverity_tool.tgz || true
+  - travis_wait 35 curl --url "https://scan.coverity.com/download/linux64?token=${COVERTY_TOKEN}&project=reactive-firewall%2Fpython-repo" -o coverity_tool.tgz || true
   - travis_wait tar xzf coverity_tool.tgz || true
   - rm -fr cov-int || true
   - cov-build --dir cov-int ./ || true

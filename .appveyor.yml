@@ -32,11 +32,19 @@ test_script:
 - cmd: >-
     make test || VER>NUL
 
+    dir
+
     coverage combine || VER>NUL
+
+    dir
 
     coverage xml || VER>NUL
 
+    dir
+
     codecov || VER>NUL
+
+    dir
 
     make test-style || VER>NUL
 deploy: off

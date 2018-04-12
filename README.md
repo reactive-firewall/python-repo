@@ -76,5 +76,5 @@ Not in a rush? Then be sure to edit the badges in the README.
 (hint: `sed -e 's/python-repo/MY-NEW-REPO' ./README.md`)
 
 
-[![License - MIT](https://img.shields.io/github/license/reactive-firewall/PiAP-python-tools.svg?maxAge=2592000)](https://github.com/reactive-firewall/python-repo/blob/stable/LICENSE.md)
+[![License - MIT](https://img.shields.io/github/license/reactive-firewall/python-repo.svg?maxAge=2592000)](https://github.com/reactive-firewall/python-repo/blob/stable/LICENSE.md)
 

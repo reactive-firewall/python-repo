@@ -13,8 +13,7 @@ By default this template will assume that the Travis CI Service and Circle-CI Se
 [![Appveyor](https://ci.appveyor.com/api/projects/status/6gggp1wpbnnjokm4/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/python-repo/branch/master)
 [![Python 3](https://pyup.io/repos/github/reactive-firewall/python-repo/python-3-shield.svg)](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/)
 [![Updates](https://pyup.io/repos/github/reactive-firewall/python-repo/shield.svg)](https://pyup.io/repos/github/reactive-firewall/python-repo/)
-[![Dependency Status](https://gemnasium.com/badges/github.com/reactive-firewall/python-repo.svg)](https://gemnasium.com/github.com/reactive-firewall/python-repo)
-[![Dependency Status](https://www.versioneye.com/user/projects/59cc1dc1368b0831e6126dc6/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59cc1dc1368b0831e6126dc6)
+![Size](https://img.shields.io/github/languages/code-size/reactive-firewall/python-repo.svg)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/f76f4e7e2eae6bff9b6a/test_coverage)](https://codeclimate.com/github/reactive-firewall/python-repo/test_coverage)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/master/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/master/)
 [![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/python-repo/badge.svg?branch=master)](https://coveralls.io/github/reactive-firewall/python-repo?branch=master)
@@ -25,10 +24,10 @@ By default this template will assume that the Travis CI Service and Circle-CI Se
 ### Stable:
 [![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=stable)](https://travis-ci.org/reactive-firewall/python-repo)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/stable)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/6gggp1wpbnnjokm4/branch/stable?svg=true)](https://ci.appveyor.com/project/reactive-firewall/python-repo/branch/stable)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/)
 [![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/python-repo/badge.svg?branch=stable)](https://coveralls.io/github/reactive-firewall/python-repo?branch=stable)
-[![Dependency Status](https://www.versioneye.com/user/projects/59cc1dce368b083214208a72/badge.svg?style=flat-round)](https://www.versioneye.com/user/projects/59cc1dce368b083214208a72)
 
 
 # How do I use this to create a new project repo?

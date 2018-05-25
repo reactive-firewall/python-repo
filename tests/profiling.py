@@ -173,7 +173,7 @@ def main(argv=None):
 	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
 
 
-if __name__ in u'__main__':
+if __name__ in '__main__':
 	try:
 		exit(main(sys.argv[1:]))
 	except Exception:

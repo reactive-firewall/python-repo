@@ -126,6 +126,7 @@ try:  # noqa
 	def do_profile(follow=[]):
 		if follow is None:
 			follow = []
+
 		def inner(func):
 			def profiled_func(*args, **kwargs):
 				try:
@@ -145,6 +146,7 @@ except ImportError:
 		"Helpful if you accidentally leave in production!"
 		if follow is None:
 			follow = []
+
 		def inner(func):
 			def nothing(*args, **kwargs):
 				return func(*args, **kwargs)

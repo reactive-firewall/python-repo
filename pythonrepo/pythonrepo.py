@@ -103,8 +103,10 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
-def useTool(tool, arguments=[None]):
+def useTool(tool, arguments=None):
 	"""Handler for launching the functions."""
+	if arguments is None:
+		arguments = [None]
 	if tool is None:
 		return None
 	if tool in TASK_OPTIONS.keys():

@@ -59,7 +59,7 @@ def checkPythonCommand(args=None, stderr=None):
 			args = [None]
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
+			if str("coverage ") in str(args[0]):
 				if sys.__name__ is None:
 					raise ImportError("Failed to import system. WTF?!!")
 				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):

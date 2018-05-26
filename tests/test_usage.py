@@ -94,14 +94,15 @@ def timePythonCommand(args=None, stderr=None):
 	return checkPythonCommand(args, stderr)
 
 
-def checkPythonErrors(args=[None], stderr=None):
+def checkPythonErrors(args=None, stderr=None):
 	"""Function like checkPythonCommand, but with error passing."""
 	theOutput = None
 	try:
 		if args is None or args is [None]:
+			args = [None]
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
+			if str("coverage ") in str(args[0]):
 				import sys
 				if sys.__name__ is None:
 					raise ImportError("Failed to import system. WTF?!!")

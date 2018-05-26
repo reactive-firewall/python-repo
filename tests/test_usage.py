@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -51,30 +51,40 @@ def getPythonCommand():
 	return str(thepython)
 
 
+def buildPythonCommand(args=None):
+	"""Function for building backend subprocess command line"""
+	theArgs = args
+	# you need to change this to the name of your project
+	__project__ = str("pythonrepo")
+	try:
+		if args is None or args is [None]:
+			theArgs = ["exit 1 ; #"]
+		else:
+			theArgs = args
+		if str("coverage ") in str(theArgs[0]):
+			if str("{} -m coverage ").format(str(sys.executable)) in str(theArgs[0]):
+				theArgs[0] = str(sys.executable)
+				theArgs.insert(1, str("-m"))
+				theArgs.insert(2, str("coverage"))
+				theArgs.insert(3, str("run"))
+				theArgs.insert(4, str("-p"))
+				theArgs.insert(4, str("--source={}").format(__project__))
+			else:
+				theArgs[0] = str("coverage")
+				theArgs.insert(1, str("run"))
+				theArgs.insert(2, str("-p"))
+				theArgs.insert(2, str("--source={}").format(__project__))
+	except Exception:
+		theArgs = ["exit 1 ; #"]
+	return theArgs
+
+
 def checkPythonCommand(args=None, stderr=None):
 	"""Function for backend subprocess check_output command like testing with coverage support"""
 	theOutput = None
 	try:
-		if args is None or args is [None]:
-			args = [None]
-			theOutput = subprocess.check_output(["exit 1 ; #"])
-		else:
-			if str("coverage ") in str(args[0]):
-				if sys.__name__ is None:
-					raise ImportError("Failed to import system. WTF?!!")
-				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					args.insert(4, str("--source=pythonrepo"))
-				else:
-					args[0] = str("coverage")
-					args.insert(1, str("run"))
-					args.insert(2, str("-p"))
-					args.insert(2, str("--source=pythonrepo"))
-			theOutput = subprocess.check_output(args, stderr=stderr)
+		taintArgs = buildPythonCommand(args)
+		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
 	except Exception:
 		theOutput = None
 	try:
@@ -98,28 +108,8 @@ def checkPythonErrors(args=None, stderr=None):
 	"""Function like checkPythonCommand, but with error passing."""
 	theOutput = None
 	try:
-		if args is None or args is [None]:
-			args = [None]
-			theOutput = subprocess.check_output(["exit 1 ; #"])
-		else:
-			if str("coverage ") in str(args[0]):
-				import sys
-				if sys.__name__ is None:
-					raise ImportError("Failed to import system. WTF?!!")
-				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
-					args[0] = str(sys.executable)
-					args.insert(1, str("-m"))
-					args.insert(2, str("coverage"))
-					args.insert(3, str("run"))
-					args.insert(4, str("-p"))
-					# you need to change this to the name of your project
-					args.insert(4, str("--source=pythonrepo"))
-				else:
-					args[0] = str("coverage")
-					args.insert(1, str("run"))
-					args.insert(2, str("-p"))
-					args.insert(2, str("--source=pythonrepo"))
-			theOutput = subprocess.check_output(args, stderr=stderr)
+		taintArgs = buildPythonCommand(args)
+		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
 		if isinstance(theOutput, bytes):
 			# default to utf8 your milage may vary
 			theOutput = theOutput.decode('utf8')
@@ -138,7 +128,7 @@ def debugBlob(blob=None):
 		print(str(blob))
 		print(str("""\""""))
 		print(str(""))
-		print(str("CODE:"))
+		print(str("Raw:"))
 		print(str("""\""""))
 		print(repr(blob))
 		print(str("""\""""))
@@ -148,15 +138,36 @@ def debugBlob(blob=None):
 	return True
 
 
+def debugIfNoneResult(thepython, theArgs, theOutput):
+	"""In case you need it."""
+	try:
+		if (str(theOutput) is not None):
+			theResult = True
+		else:
+			theResult = False
+			print(str(""))
+			print(str("python exe is {}").format(str(sys.executable)))
+			print(str("python cmd used is {}").format(str(thepython)))
+			print(str("arguments used were {}").format(str(theArgs)))
+			print(str(""))
+			print(str("actual output was..."))
+			print(str(""))
+			print(str("{}").format(str(theOutput)))
+			print(str(""))
+	except Exception:
+		theResult = False
+	return theResult
+
+
 class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
 	def test_absolute_truth_and_meaning(self):
-		"""Insanity Test."""
+		"""Insanity Test. if ( is true ) """
 		assert True
 
 	def test_syntax(self):
-		"""Test case importing code."""
+		"""Test case importing code. if ( import is not None ) """
 		theResult = False
 		try:
 			from .context import pythonrepo
@@ -193,19 +204,8 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					if (str(theOutputtext) is not None):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python exe is {}").format(str(sys.executable)))
-						print(str("python cmd used is {}").format(str(thepython)))
-						print(str("arguments used were {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+					# ADD REAL VERSION TEST HERE
+					theResult = debugIfNoneResult(thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
@@ -243,19 +243,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					if (str(theOutputtext) is not None):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python exe is {}").format(str(sys.executable)))
-						print(str("python cmd used is {}").format(str(thepython)))
-						print(str("arguments used were {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+					theResult = debugIfNoneResult(thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
@@ -294,19 +282,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					if (str(theOutputtext) is not None):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python exe is {}").format(str(sys.executable)))
-						print(str("python cmd used is {}").format(str(thepython)))
-						print(str("arguments used were {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+					theResult = debugIfNoneResult(thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
@@ -345,19 +321,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					if (str(theOutputtext) is not None):
-						theResult = True
-					else:
-						theResult = False
-						print(str(""))
-						print(str("python exe is {}").format(str(sys.executable)))
-						print(str("python cmd used is {}").format(str(thepython)))
-						print(str("arguments used were {}").format(str(thepython)))
-						print(str(""))
-						print(str("actual output was..."))
-						print(str(""))
-						print(str("{}").format(str(theOutputtext)))
-						print(str(""))
+					theResult = debugIfNoneResult(thepython, args, theOutputtext)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:

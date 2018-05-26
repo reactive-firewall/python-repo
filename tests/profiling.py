@@ -43,7 +43,6 @@ try:
 			)
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
@@ -123,7 +122,7 @@ def do_cprofile(func):
 try:  # noqa
 	from line_profiler import LineProfiler
 
-	def do_profile(follow=[]):
+	def do_profile(follow=None):
 		if follow is None:
 			follow = []
 

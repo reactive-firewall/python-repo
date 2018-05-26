@@ -51,11 +51,12 @@ def getPythonCommand():
 	return str(thepython)
 
 
-def checkPythonCommand(args=[None], stderr=None):
+def checkPythonCommand(args=None, stderr=None):
 	"""Function for backend subprocess check_output command like testing with coverage support"""
 	theOutput = None
 	try:
 		if args is None or args is [None]:
+			args = [None]
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
 			if str("coverage ") in args[0]:

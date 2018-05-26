@@ -2,7 +2,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 # limitations under the License.
 
 
-__version__ = """1.0.1"""
-"""This is version 1.0.1 of pythonrepo Template"""
+__version__ = """1.1.0"""
+"""This is version 1.1.0 of pythonrepo Template"""
 
 try:
 	import sys

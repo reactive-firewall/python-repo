@@ -21,7 +21,7 @@
 import unittest
 import subprocess
 import sys
-import profiling as profiling
+import tests.profiling as profiling
 
 
 def getPythonCommand():

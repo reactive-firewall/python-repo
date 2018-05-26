@@ -161,7 +161,7 @@ if __name__ in '__main__':
 	exitcode = 3
 	try:
 		exitcode = main(sys.argv[1:])
-	finaly:
+	finally:
 		exit(exitcode)
 
 

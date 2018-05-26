@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -31,38 +31,18 @@
 
 try:
 	import os
-	if os.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the os. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
 	import sys
-	if sys.__name__ is None:
-		raise NotImplementedError("OMG! We could not import the sys. We're like in the matrix!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
 	import time
-	if time.__name__ is None:
-		raise NotImplementedError("OMG! We could not import time. We're like in the speed-force!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
-
-
-try:
 	import cProfile
-	if cProfile.__name__ is None:
-		raise NotImplementedError("OMG! We could not import cProfile. ABORT!")
+	for keyModule in [os, sys, time, cProfile]:
+		if keyModule.__name__ is None:
+			raise NotImplementedError(
+				str("OMG! We could not import the {}!").format(
+					str(keyModule)
+				)
+			)
 except Exception as err:
 	raise ImportError(err)
-	exit(3)
 
 
 try:
@@ -106,7 +86,6 @@ class timewith():
 
 	def __exit__(self, type, value, traceback):
 		self.checkpoint(str("finished"))
-		pass
 
 
 def do_time_profile(func, timer_name="time_profile"):
@@ -143,7 +122,10 @@ def do_cprofile(func):
 try:  # noqa
 	from line_profiler import LineProfiler
 
-	def do_profile(follow=[]):
+	def do_profile(follow=None):
+		if follow is None:
+			follow = []
+
 		def inner(func):
 			def profiled_func(*args, **kwargs):
 				try:
@@ -159,8 +141,11 @@ try:  # noqa
 		return inner
 
 except ImportError:
-	def do_profile(follow=[]):
+	def do_profile(follow=None):
 		"Helpful if you accidentally leave in production!"
+		if follow is None:
+			follow = []
+
 		def inner(func):
 			def nothing(*args, **kwargs):
 				return func(*args, **kwargs)
@@ -173,10 +158,11 @@ def main(argv=None):
 	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
 
 
-if __name__ in u'__main__':
+if __name__ in '__main__':
+	exitcode = 3
 	try:
-		exit(main(sys.argv[1:]))
-	except Exception:
-		exit(3)
+		exitcode = main(sys.argv[1:])
+	finally:
+		exit(exitcode)
 
 

@@ -2,7 +2,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 # limitations under the License.
 
 
-__version__ = """1.0.1"""
-"""This is version 1.0.1 of pythonrepo Template"""
+__version__ = """1.1.0"""
+"""This is version 1.1.0 of pythonrepo Template"""
 
 try:
 	import sys
@@ -38,10 +38,10 @@ try:
 	from . import pythonrepo as pythonrepo
 except Exception as importErr:
 	del importErr
-	import pythonrepo as pythonrepo
+	import pythonrepo.pythonrepo as pythonrepo
 
 
-if __name__ in u'__main__':
+if __name__ in '__main__':
 	if pythonrepo.__name__ is None:
 		raise ImportError(str("Failed to open pythonrepo"))
 	pythonrepo.main(sys.argv[1:])

@@ -21,7 +21,7 @@
 import unittest
 import subprocess
 import sys
-import profiling as profiling
+import tests.profiling as profiling
 
 
 def getPythonCommand():
@@ -51,14 +51,15 @@ def getPythonCommand():
 	return str(thepython)
 
 
-def checkPythonCommand(args=[None], stderr=None):
+def checkPythonCommand(args=None, stderr=None):
 	"""Function for backend subprocess check_output command like testing with coverage support"""
 	theOutput = None
 	try:
 		if args is None or args is [None]:
+			args = [None]
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
+			if str("coverage ") in str(args[0]):
 				if sys.__name__ is None:
 					raise ImportError("Failed to import system. WTF?!!")
 				if str("{} -m coverage ").format(str(sys.executable)) in str(args[0]):
@@ -85,20 +86,23 @@ def checkPythonCommand(args=[None], stderr=None):
 
 
 @profiling.do_cprofile
-def timePythonCommand(args=[None], stderr=None):
+def timePythonCommand(args=None, stderr=None):
 	"""Function for backend subprocess check_output command
 	with support for coverage and profiling."""
+	if args is None:
+		args = [None]
 	return checkPythonCommand(args, stderr)
 
 
-def checkPythonErrors(args=[None], stderr=None):
+def checkPythonErrors(args=None, stderr=None):
 	"""Function like checkPythonCommand, but with error passing."""
 	theOutput = None
 	try:
 		if args is None or args is [None]:
+			args = [None]
 			theOutput = subprocess.check_output(["exit 1 ; #"])
 		else:
-			if str("coverage ") in args[0]:
+			if str("coverage ") in str(args[0]):
 				import sys
 				if sys.__name__ is None:
 					raise ImportError("Failed to import system. WTF?!!")

@@ -38,7 +38,7 @@ try:
 	from . import pythonrepo as pythonrepo
 except Exception as importErr:
 	del importErr
-	import pythonrepo as pythonrepo
+	import pythonrepo.pythonrepo as pythonrepo
 
 
 if __name__ in '__main__':

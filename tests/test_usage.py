@@ -86,9 +86,11 @@ def checkPythonCommand(args=None, stderr=None):
 
 
 @profiling.do_cprofile
-def timePythonCommand(args=[None], stderr=None):
+def timePythonCommand(args=None, stderr=None):
 	"""Function for backend subprocess check_output command
 	with support for coverage and profiling."""
+	if args is None:
+		args = [None]
 	return checkPythonCommand(args, stderr)
 
 

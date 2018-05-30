@@ -168,7 +168,7 @@ script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP make test" ; else make test || exit $? ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP codecov" ; else codecov || exit $? ; fi ;
   - cp -vf .coverage ".coverall.Lasting.45678.12345" 2>/dev/null || true
-  - make clean || exit $? ; 
+  - make clean || exit $? ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP make test-tox" ; else make test-tox || exit $? ; fi ;
   - make clean ;
   - mv -vf ".coverall.Lasting.45678.12345" .coverage 2>/dev/null || true

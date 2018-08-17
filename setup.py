@@ -48,7 +48,7 @@ license = readFile("""LICENSE.md""")
 
 setup(
 	name="""pythonrepo""",
-	version="""1.0.2""",
+	version="""1.1.0""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

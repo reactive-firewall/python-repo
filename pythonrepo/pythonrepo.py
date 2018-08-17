@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ __epilog__ = str(
 """Contains the short epilog of the program CLI help text."""
 
 
-__version__ = """1.0.0"""
+__version__ = """1.1.0"""
 """The version of this program."""
 
 

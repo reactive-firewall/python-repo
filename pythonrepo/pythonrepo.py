@@ -19,7 +19,6 @@
 
 
 try:
-	import os
 	import sys
 	import argparse
 except Exception as err:

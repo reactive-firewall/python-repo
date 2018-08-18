@@ -20,11 +20,15 @@
 __version__ = """1.1.0"""
 """This is version 1.1.0 of pythonrepo Template"""
 
+
 try:
 	import sys
 	import os
 	if 'pythonrepo' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+		__parentPath = os.path.join(
+			os.path.dirname(__file__), '..'
+		)
+		sys.path.insert(0, os.path.abspath(__parentPath))
 except Exception as ImportErr:
 	print(str(type(ImportErr)))
 	print(str(ImportErr))

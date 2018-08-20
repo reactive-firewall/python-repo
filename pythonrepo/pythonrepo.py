@@ -9,7 +9,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/python-repo/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -100,16 +100,14 @@ def useTool(tool, arguments=None):
 	"""Handler for launching the functions."""
 	if arguments is None:
 		arguments = [None]
-	if tool is None:
-		return None
-	if tool in TASK_OPTIONS.keys():
+	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
 		try:
 			# print(str("launching: " + tool))
 			TASK_OPTIONS[tool](arguments)
 		except Exception:
 			print(str(
 				"WARNING - An error occured while" +
-				"handling the shell. Cascading failure."
+				"handling the tool. Cascading failure."
 			))
 	else:
 		return None
@@ -140,6 +138,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-	if (sys.argv is not None) and (sys.argv is not []):
-		if (len(sys.argv) > 1):
-			main(sys.argv[1:])
+	if (sys.argv is not None) and (len(sys.argv) >= 1):
+		main(sys.argv[1:])

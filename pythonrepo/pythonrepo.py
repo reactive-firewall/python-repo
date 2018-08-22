@@ -96,10 +96,16 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
+def __checkToolArgs(args=None):
+	"""Handles None case for arguments as a helper function."""
+	if args is None:
+		args = [None]
+	return args
+
+
 def useTool(tool, arguments=None):
 	"""Handler for launching the functions."""
-	if arguments is None:
-		arguments = [None]
+	arguments = __checkToolArgs(arguments)
 	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
 		try:
 			# print(str("launching: " + tool))

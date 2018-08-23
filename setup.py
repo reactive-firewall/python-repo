@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,7 +48,7 @@ license = readFile("""LICENSE.md""")
 
 setup(
 	name="""pythonrepo""",
-	version="""1.0.2""",
+	version="""1.1.0""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

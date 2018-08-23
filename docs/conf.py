@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'python_template'
-copyright = u'2017, reactive-firewall'
+copyright = u'2017-2018, reactive-firewall'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -65,7 +65,7 @@ release = 'v1.0.2'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build']
+exclude_patterns = ['_build', 'tests']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None

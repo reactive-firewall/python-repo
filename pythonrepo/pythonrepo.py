@@ -3,13 +3,13 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017, Kendrick Walls
+# Copyright (c) 2017-2018, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://www.github.com/reactive-firewall/python-repo/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,15 +19,8 @@
 
 
 try:
-	import os
 	import sys
 	import argparse
-	sys.path.insert(
-		0,
-		os.path.abspath(
-			os.path.join(os.path.dirname(__file__), '..')
-		)
-	)
 except Exception as err:
 	# Show Error Info
 	print(str(type(err)))
@@ -57,7 +50,7 @@ __epilog__ = str(
 """Contains the short epilog of the program CLI help text."""
 
 
-__version__ = """1.0.0"""
+__version__ = """1.1.0"""
 """The version of this program."""
 
 
@@ -103,20 +96,24 @@ def parseArgs(arguments=None):
 	return parser.parse_known_args(arguments)
 
 
+def __checkToolArgs(args=None):
+	"""Handles None case for arguments as a helper function."""
+	if args is None:
+		args = [None]
+	return args
+
+
 def useTool(tool, arguments=None):
 	"""Handler for launching the functions."""
-	if arguments is None:
-		arguments = [None]
-	if tool is None:
-		return None
-	if tool in TASK_OPTIONS.keys():
+	arguments = __checkToolArgs(arguments)
+	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
 		try:
 			# print(str("launching: " + tool))
 			TASK_OPTIONS[tool](arguments)
 		except Exception:
 			print(str(
 				"WARNING - An error occured while" +
-				"handling the shell. Cascading failure."
+				"handling the tool. Cascading failure."
 			))
 	else:
 		return None
@@ -147,6 +144,5 @@ def main(argv=None):
 
 
 if __name__ == '__main__':
-	if (sys.argv is not None) and (sys.argv is not []):
-		if (len(sys.argv) > 1):
-			main(sys.argv[1:])
+	if (sys.argv is not None) and (len(sys.argv) >= 1):
+		main(sys.argv[1:])

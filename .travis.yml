@@ -14,7 +14,7 @@ addons:
       description: Python Repo Template
     # Commands to prepare for build_command
     # ** likely specific to your build **
-    build_command_prepend: make clean
+    build_command_prepend: make clean ;
     # The command that will be added as an argument to "cov-build" to compile your project for analysis,
     # ** likely specific to your build **
     build_command: make test
@@ -193,6 +193,7 @@ before_install:
   - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
   - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
   - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
+  - echo -n | openssl s_client -connect https://scan.coverity.com:443 2>/dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' 2>/dev/null | sudo tee -a /etc/ssl/certs/ca- || true ;
 
 # The following is used to get coveralls working: add affter codecov
 #  - travis_retry pip install python-coveralls 2>/dev/null || python3 -m pip install python-coveralls || true ;

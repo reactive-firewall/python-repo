@@ -163,6 +163,8 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python2.6 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python26 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python@3 || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then travis_wait brew install python@2 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.3 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install py3.3 || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install python3.4 || true ; fi

@@ -10,7 +10,7 @@ addons:
     # GitHub project metadata
     project:
       name: reactive-firewall/python-repo
-      version: 1.1.0
+      version: 1.1.1
       description: Python Repo Template
     # Commands to prepare for build_command
     # ** likely specific to your build **

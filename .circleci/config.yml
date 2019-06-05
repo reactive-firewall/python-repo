@@ -57,7 +57,7 @@ jobs:
           shell: /bin/bash
           name: "clean up for test"
           command: |
-            python3 -m pip install --user coverage || true            
+            python3 -m pip install --user coverage || true
           when: on_success
       - run:
           shell: /bin/bash
@@ -103,13 +103,13 @@ jobs:
           shell: /bin/bash
           name: "clean up for test"
           command: |
-            python3 -m pip install --user coverage || true            
+            python3 -m pip install --user coverage || true
           when: on_success
       - run:
           shell: /bin/bash
           name: "setup up for pytest"
           command: |
-            python3 -m pip install --user pytest || true            
+            python3 -m pip install --user pytest || true
           when: on_success
       - run:
           shell: /bin/bash

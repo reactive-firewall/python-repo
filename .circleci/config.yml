@@ -84,6 +84,64 @@ jobs:
             make clean
           when: on_fail
 
+  pytest:
+    docker:
+      - image: circleci/python:3.6.1
+      - image: circleci/python:3.7
+    parallelism: 2
+    environment:
+      CI: cicleci
+      DEBIAN_FRONTEND: noninteractive
+      LANG: en_US.UTF-8
+      LC_CTYPE: en_EN.UTF-8
+      SHELL: /bin/bash
+    working_directory: ~/python-repo
+    steps:
+      - restore_cache:
+          key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
+      - run:
+          shell: /bin/bash
+          name: "clean up for test"
+          command: |
+            python3 -m pip install --user coverage || true            
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "setup up for pytest"
+          command: |
+            python3 -m pip install --user pytest || true            
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up for pytest"
+          command: |
+            make clean
+          when: always
+      - run:
+          shell: /bin/bash
+          name: "pytest Unit Tests"
+          command: |
+            make test-pytest
+          when: on_success
+      - store_test_results:
+          path: test-reports
+          when: on_success
+      - store_artifacts:
+          path: test-reports
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "clean up from pytest"
+          command: |
+            make clean
+          when: always
+      - run:
+          shell: /bin/bash
+          name: "clean up from FAIL"
+          command: |
+            make clean
+          when: on_fail
+
   lint:
     docker:
       - image: circleci/python:3.6.1
@@ -126,5 +184,8 @@ workflows:
           requires:
             - build
       - lint:
+          requires:
+            - build
+      - pytest:
           requires:
             - build

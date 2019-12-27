@@ -112,6 +112,10 @@ jobs:
     osx_image: xcode10.2
     language: shell
   - os: linux
+    dist: trusty
+  - os: linux
+    dist: xenial
+  - os: linux
     python:  "3.6-dev"
     env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux

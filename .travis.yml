@@ -20,20 +20,13 @@ python:
   - "nightly"
 
 osx_image:
-  - xcode6.4
-  - xcode7
-  - xcode8
   - xcode9
   - xcode10
-  - xcode10.1
-  - xcode10.2
   - xcode10.3
   - xcode11
-  - xcode11.2
   - xcode11.3
 
 dist:
-  - trusty
   - xenial
   - bionic
 
@@ -92,11 +85,6 @@ jobs:
     language: shell
   allow_failures:
   - os: osx
-    osx_image: xcode9
-    language: shell
-  - os: osx
-    osx_image: xcode9.2
-    language: shell
   - os: osx
     osx_image: xcode9.3
     language: shell

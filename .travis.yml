@@ -102,10 +102,10 @@ jobs:
   - os: linux
     language: python
     osx_image: xcode10.3
-   - os: linux
+  - os: linux
     language: python
     osx_image: xcode11
-    - os: linux
+  - os: linux
     language: python
     osx_image: xcode11.3
   allow_failures:

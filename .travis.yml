@@ -1,9 +1,41 @@
-language: python
+language:
+  - python
+  - shell
+
+os:
+  - osx
+  - linux
+
 sudo: false
 
 python:
+  - "2.7"
+  - "3.2"
+  - "3.3"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8"
+  - "nightly"
+
+osx_image:
+  - xcode6.4
+  - xcode7
+  - xcode8
+  - xcode9
+  - xcode10
+  - xcode10.1
+  - xcode10.2
+  - xcode10.3
+  - xcode11
+  - xcode11.2
+  - xcode11.3
 
 dist:
+  - trusty
+  - xenial
+  - bionic
 
 addons:
   coverity_scan:
@@ -29,41 +61,17 @@ branches:
     - master
 
 env:
+  - TRAVIS_PYTHON_VERSION="2.7"
+  - TRAVIS_PYTHON_VERSION="3.2"
+  - TRAVIS_PYTHON_VERSION="3.3"
+  - TRAVIS_PYTHON_VERSION="3.4"
+  - TRAVIS_PYTHON_VERSION="3.5"
+  - TRAVIS_PYTHON_VERSION="3.6"
+  - TRAVIS_PYTHON_VERSION="3.7"
+  - TRAVIS_PYTHON_VERSION="3.8"
 
-matrix:
+jobs:
   include:
-  - os: linux
-    python:  "2.7"
-    env: TRAVIS_PYTHON_VERSION="2.7"
-    dist: trusty
-  - os: linux
-    python:  "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
-  - os: linux
-    python:  "3.3"
-    env: TRAVIS_PYTHON_VERSION="3.3"
-  - os: linux
-    python:  "3.4"
-    env: TRAVIS_PYTHON_VERSION="3.4"
-  - os: linux
-    python:  "3.5"
-    env: TRAVIS_PYTHON_VERSION="3.5"
-    dist: trusty
-  - os: linux
-    python:  "3.6"
-    env: TRAVIS_PYTHON_VERSION="3.6"
-  - os: linux
-    python:  "3.5-dev" # 3.5 development branch
-    env: TRAVIS_PYTHON_VERSION="3.5"
-  - os: linux
-    python:  "3.6-dev"
-    env: TRAVIS_PYTHON_VERSION="3.6"
-  - os: linux
-    python:  "3.7-dev"
-    env: TRAVIS_PYTHON_VERSION="3.7"
-  - os: linux
-    python:  "3.8-dev"
-    env: TRAVIS_PYTHON_VERSION="3.8"
   - os: linux
     python:  "pypy2.7-5.8.0"
   - os: linux
@@ -77,56 +85,52 @@ matrix:
     python:  "pypy2.7-5.10.0"
     env: TRAVIS_PYTHON_VERSION="2.7"
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    python:  "nightly" # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
   - os: osx
-    osx_image: xcode7.2
-    language: generic
-  - os: osx
-    osx_image: xcode7.3
-    language: generic
-  - os: osx
-    osx_image: xcode8
-    language: generic
-  - os: osx
-    osx_image: xcode8.3
-    language: generic
+    osx_image: xcode11.3
+    language: shell
+  allow_failures:
   - os: osx
     osx_image: xcode9
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode9.2
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode9.3
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode9.4
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode10
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode10.1
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode10.2
-    language: generic
-  allow_failures:
+    language: shell
+  - os: linux
+    python:  "3.6-dev"
+    env: TRAVIS_PYTHON_VERSION="3.6"
   - os: linux
     python:  "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode6.4
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode7.2
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode7.3
-    language: generic
+    language: shell
   - os: linux
     python:  "2.6"
+  - os: linux
+    python:  "2.7"
   - os: linux
     python:  "3.2"
     env: TRAVIS_PYTHON_VERSION="3.2"
@@ -140,6 +144,8 @@ matrix:
     python:  "nightly"
   - os: linux
     python:  "3.2"
+  - os: linux
+    python:  "3.3"
   - os: linux
     python: "pypy"
   - os: linux
@@ -157,8 +163,8 @@ matrix:
   - os: linux
     python:  "pypy3.5-6.0"
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+    python:  "nightly" # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
 
 install:  "make init"
 
@@ -238,7 +244,7 @@ after_success:
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP coverage" ; else coverage combine 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP coverage xml" ; else coverage xml 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
-  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] |||| [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov || true ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov || true ; fi ;
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP coveralls" ; else coveralls 2>/dev/null || true ; fi ;
 

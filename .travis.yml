@@ -1,10 +1,8 @@
 language:
   - python
-  - shell
 
 os:
   - linux
-  - osx
 
 sudo: false
 
@@ -19,15 +17,8 @@ python:
   - "3.8"
   - "nightly"
 
-osx_image:
-  -
-  - xcode9
-  - xcode10
-  - xcode10.3
-  - xcode11
-  - xcode11.3
-
 dist:
+  - trusty
   - xenial
   - bionic
 
@@ -83,7 +74,16 @@ jobs:
     python:  "nightly" # currently points to 3.8-dev
     env: TRAVIS_PYTHON_VERSION="3.8-dev"
   - os: osx
+    osx_image: xcode9
+    language: shell
+  - os: osx
     osx_image: xcode10
+    language: shell
+  - os: osx
+    osx_image: xcode10.2
+    language: shell
+  - os: osx
+    osx_image: xcode11
     language: shell
   - os: osx
     osx_image: xcode11.3
@@ -93,21 +93,6 @@ jobs:
     language: python
   - os: linux
     language: shell
-  - os: linux
-    language: python
-    osx_image: xcode9
-  - os: linux
-    language: python
-    osx_image: xcode10
-  - os: linux
-    language: python
-    osx_image: xcode10.3
-  - os: linux
-    language: python
-    osx_image: xcode11
-  - os: linux
-    language: python
-    osx_image: xcode11.3
   allow_failures:
   - os: osx
     osx_image: xcode9

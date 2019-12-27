@@ -18,7 +18,6 @@ python:
   - "nightly"
 
 dist:
-  - trusty
   - xenial
   - bionic
 

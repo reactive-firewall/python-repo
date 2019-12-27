@@ -1,6 +1,5 @@
 language:
   - python
-  - shell
 
 os:
   - osx
@@ -80,6 +79,9 @@ jobs:
   - os: linux
     python:  "nightly" # currently points to 3.8-dev
     env: TRAVIS_PYTHON_VERSION="3.8-dev"
+  - os: osx
+    osx_image: xcode10
+    language: shell
   - os: osx
     osx_image: xcode11.3
     language: shell

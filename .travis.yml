@@ -1,9 +1,10 @@
 language:
   - python
+  - shell
 
 os:
-  - osx
   - linux
+  - osx
 
 sudo: false
 
@@ -19,6 +20,7 @@ python:
   - "nightly"
 
 osx_image:
+  -
   - xcode9
   - xcode10
   - xcode10.3
@@ -85,6 +87,11 @@ jobs:
     language: shell
   - os: osx
     osx_image: xcode11.3
+    language: shell
+  exclude:
+  - os: osx
+    language: python
+  - os: linux
     language: shell
   allow_failures:
   - os: osx

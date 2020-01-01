@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2020, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -44,17 +44,17 @@ except Exception:
 	requirements = None
 
 readme = readFile("""README.md""")
-license = readFile("""LICENSE.md""")
+SLA = readFile("""LICENSE.md""")
 
 setup(
 	name="""pythonrepo""",
-	version="""1.1.1""",
+	version="""1.1.2""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,
 	author="""reactive-firewall""",
 	author_email="""reactive-firewall@users.noreply.github.com""",
 	url="""https://github.com/reactive-firewall/python-repo.git""",
-	license=license,
+	license=SLA,
 	packages=find_packages(exclude=("""tests""", """docs""")),
 )

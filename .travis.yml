@@ -39,16 +39,23 @@ matrix:
   - os: linux
     python:  "3.2"
     env: TRAVIS_PYTHON_VERSION="3.2"
+    dist: trusty
   - os: linux
     python:  "3.3"
     env: TRAVIS_PYTHON_VERSION="3.3"
+    dist: trusty
   - os: linux
     python:  "3.4"
+    dist: xenial
     env: TRAVIS_PYTHON_VERSION="3.4"
   - os: linux
     python:  "3.5"
     env: TRAVIS_PYTHON_VERSION="3.5"
     dist: trusty
+  - os: linux
+    python:  "3.5"
+    env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: xenial
   - os: linux
     python:  "3.6"
     env: TRAVIS_PYTHON_VERSION="3.6"
@@ -62,63 +69,50 @@ matrix:
     python:  "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
   - os: linux
+    python:  "3.7"
+    env: TRAVIS_PYTHON_VERSION="3.7"
+  - os: linux
     python:  "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
   - os: linux
     python:  "pypy2.7-5.8.0"
+    dist: xenial
   - os: linux
     python:  "pypy3.5-5.8.0"
+    dist: xenial
   - os: linux
     python:  "pypy3.5-6.0"
+    dist: xenial
   - os: linux
     python:  "pypy3.5-5.10.0"
     env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: xenial
   - os: linux
     python:  "pypy2.7-5.10.0"
     env: TRAVIS_PYTHON_VERSION="2.7"
+    dist: xenial
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
-  - os: osx
-    osx_image: xcode7.2
-    language: generic
-  - os: osx
-    osx_image: xcode7.3
-    language: generic
-  - os: osx
-    osx_image: xcode8
-    language: generic
-  - os: osx
-    osx_image: xcode8.3
-    language: generic
-  - os: osx
-    osx_image: xcode9
-    language: generic
-  - os: osx
-    osx_image: xcode9.2
-    language: generic
-  - os: osx
-    osx_image: xcode9.3
-    language: generic
-  - os: osx
-    osx_image: xcode9.4
-    language: generic
+    python:  "nightly" # currently points to 3.8-dev
+    env: TRAVIS_PYTHON_VERSION="3.8-dev"
   - os: osx
     osx_image: xcode10
-    language: generic
+    language: shell
+  - os: osx
+    osx_image: xcode11
+    language: shell
   allow_failures:
   - os: linux
     python:  "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
   - os: osx
     osx_image: xcode6.4
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode7.2
-    language: generic
+    language: shell
   - os: osx
     osx_image: xcode7.3
-    language: generic
+    language: shell
   - os: linux
     python:  "2.6"
   - os: linux
@@ -153,6 +147,31 @@ matrix:
   - os: linux
     python:  "nightly" # currently points to 3.7-dev
     env: TRAVIS_PYTHON_VERSION="3.7-dev"
+  - os: osx
+    osx_image: xcode7.2
+    language: shell
+  - os: osx
+    osx_image: xcode7.3
+    language: shell
+  - os: osx
+    osx_image: xcode8
+    language: shell
+  - os: osx
+    osx_image: xcode8.3
+    language: shell
+  - os: osx
+    osx_image: xcode9
+    language: shell
+  - os: osx
+    osx_image: xcode9.2
+    language: shell
+  - os: osx
+    osx_image: xcode9.3
+    language: shell
+  - os: osx
+    osx_image: xcode9.4
+    language: shell
+
 
 install:  "make init"
 

@@ -2,7 +2,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -69,8 +69,12 @@ install: must_be_root
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
-	$(QUITE)$(QUIET)python3 -m pip uninstall pythonrepo || true
+	$(QUITE)python3 -m pip uninstall pythonrepo || true
 	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+test-reports:
+	$(QUIET)mkdir test-reports 2>/dev/null >/dev/null || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 purge: clean uninstall
@@ -86,6 +90,10 @@ test: cleanup
 
 test-tox: cleanup
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
+	$(QUIET)$(ECHO) "$@: Done."
+
+test-pytest: cleanup test-reports
+	$(QUIET)python3 -m pytest --junitxml=test-reports/junit.xml -v tests || python -m pytest --junitxml=test-reports/junit.xml -v tests
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-style: cleanup
@@ -105,6 +113,8 @@ cleanup:
 	$(QUIET)rm -f pythonrepo/*/*.pyc 2>/dev/null || true
 	$(QUIET)rm -f pythonrepo/*/*~ 2>/dev/null || true
 	$(QUIET)rm -f *.DS_Store 2>/dev/null || true
+	$(QUIET)rm -Rf .pytest_cache/ 2>/dev/null || true
+	$(QUIET)rmdir ./test-reports/ 2>/dev/null || true
 	$(QUIET)rm -f pythonrepo/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f pythonrepo/*/*.DS_Store 2>/dev/null || true
 	$(QUIET)rm -f pythonrepo.egg-info/* 2>/dev/null || true
@@ -119,6 +129,7 @@ cleanup:
 	$(QUIET)rm -Rf ./.tox/ 2>/dev/null || true
 
 clean: cleanup
+	$(QUIET)rm -f test-results/junit.xml 2>/dev/null || true
 	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 

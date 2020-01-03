@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2018, Kendrick Walls
+# Copyright (c) 2017-2019, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -50,7 +50,7 @@ __epilog__ = str(
 """Contains the short epilog of the program CLI help text."""
 
 
-__version__ = """1.1.0"""
+__version__ = """1.1.1"""
 """The version of this program."""
 
 
@@ -111,10 +111,9 @@ def useTool(tool, arguments=None):
 			# print(str("launching: " + tool))
 			TASK_OPTIONS[tool](arguments)
 		except Exception:
-			print(str(
-				"WARNING - An error occured while" +
-				"handling the tool. Cascading failure."
-			))
+			w = str("WARNING - An error occured while")
+			w += str("handling the tool. Abort.")
+			print(w)
 	else:
 		return None
 
@@ -127,18 +126,15 @@ def main(argv=None):
 			service_cmd = args.some_task
 			useTool(service_cmd, extra)
 		except Exception:
-			print(str(
-				"WARNING - An error occured while" +
-				"handling the arguments. Cascading failure."
-			))
+			w = str("WARNING - An error occured while")
+			w += str("handling the arguments.")
+			w += str(" Cascading failure.")
+			print(w)
 			exit(2)
 	except Exception:
-		print(
-			str(
-				"CRITICAL - An error occured while handling " +
-				"the cascading failure."
-			)
-		)
+		e = str("CRITICAL - An error occured while handling")
+		e += str("the cascading failure.")
+		print(e)
 		exit(3)
 	exit(0)
 

@@ -15,7 +15,7 @@ six>=1.0.0
 #pgpy>=0.4.1
 tox>=3.0.0
 #py>=1.4.33
-pip>=9.0
+pip>=19.0
 # python-repo - MIT
 #-e git+https://github.com/reactive-firewall/python-repo.git#egg=python-repo
 

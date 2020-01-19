@@ -1,5 +1,4 @@
 language: python
-sudo: false
 
 python:
 
@@ -62,18 +61,27 @@ matrix:
   - os: linux
     python:  "3.5-dev" # 3.5 development branch
     env: TRAVIS_PYTHON_VERSION="3.5"
+    dist: xenial
   - os: linux
     python:  "3.6-dev"
     env: TRAVIS_PYTHON_VERSION="3.6"
+    dist: bionic
   - os: linux
     python:  "3.7-dev"
     env: TRAVIS_PYTHON_VERSION="3.7"
+    dist: bionic
   - os: linux
     python:  "3.7"
     env: TRAVIS_PYTHON_VERSION="3.7"
+    dist: bionic
   - os: linux
     python:  "3.8-dev"
     env: TRAVIS_PYTHON_VERSION="3.8"
+    dist: bionic
+  - os: linux
+    python:  "3.9-dev"
+    env: TRAVIS_PYTHON_VERSION="3.9"
+    dist: bionic
   - os: linux
     python:  "pypy2.7-5.8.0"
     dist: xenial
@@ -92,42 +100,47 @@ matrix:
     env: TRAVIS_PYTHON_VERSION="2.7"
     dist: xenial
   - os: linux
-    python:  "nightly" # currently points to 3.8-dev
-    env: TRAVIS_PYTHON_VERSION="3.8-dev"
+    python:  "nightly" # currently points to 3.9-dev
+    env: TRAVIS_PYTHON_VERSION="3.9-dev"
   - os: osx
     osx_image: xcode10
     language: shell
   - os: osx
-    osx_image: xcode11
+    osx_image: xcode11.1
+    language: shell
+  - os: osx
+    osx_image: xcode11.2
+    language: shell
+  - os: osx
+    osx_image: xcode11.3
     language: shell
   allow_failures:
   - os: linux
-    python:  "nightly" # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
-  - os: osx
-    osx_image: xcode6.4
-    language: shell
-  - os: osx
-    osx_image: xcode7.2
-    language: shell
-  - os: osx
-    osx_image: xcode7.3
-    language: shell
+    dist: xenial
+  - os: linux
+    dist: trusty
+  - os: linux
+    python:  "3.9-dev"
   - os: linux
     python:  "2.6"
   - os: linux
     python:  "3.2"
-    env: TRAVIS_PYTHON_VERSION="3.2"
+  - os: linux
+    python:  "3.3"
+  - os: linux
+    python:  "3.4"
+    dist: xenial
+  - os: linux
+    python:  "3.4"
+    dist: bionic
   - os: linux
     python:  "3.7-dev"
-    env: TRAVIS_PYTHON_VERSION="3.7"
   - os: linux
     python:  "3.8-dev"
-    env: TRAVIS_PYTHON_VERSION="3.8"
+  - os: linux
+    python:  "3.9-dev"
   - os: linux
     python:  "nightly"
-  - os: linux
-    python:  "3.2"
   - os: linux
     python: "pypy"
   - os: linux
@@ -138,15 +151,13 @@ matrix:
     python:  "pypy2.7-5.8.0"
   - os: linux
     python:  "pypy3.5-5.10.0"
-    env: TRAVIS_PYTHON_VERSION="3.5"
   - os: linux
     python:  "pypy2.7-5.10.0"
-    env: TRAVIS_PYTHON_VERSION="2.7"
   - os: linux
     python:  "pypy3.5-6.0"
-  - os: linux
-    python:  "nightly" # currently points to 3.7-dev
-    env: TRAVIS_PYTHON_VERSION="3.7-dev"
+  - os: osx
+    osx_image: xcode6.4
+    language: shell
   - os: osx
     osx_image: xcode7.2
     language: shell
@@ -170,6 +181,18 @@ matrix:
     language: shell
   - os: osx
     osx_image: xcode9.4
+    language: shell
+  - os: osx
+    osx_image: xcode10
+    language: shell
+  - os: osx
+    osx_image: xcode10.1
+    language: shell
+  - os: osx
+    osx_image: xcode11
+    language: shell
+  - os: osx
+    osx_image: xcode11.1
     language: shell
 
 

@@ -224,17 +224,17 @@ before_install:
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install coverage $INSTALL || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install codecov || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then brew install pip || true ; fi
-  - if [ $TRAVIS_OS_NAME == osx ] ; then export VERSIONER_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION:-3.6} || true ; fi
+  - if [ $TRAVIS_OS_NAME == osx ] ; then export VERSIONER_PYTHON_VERSION=${TRAVIS_PYTHON_VERSION:-3.7} || true ; fi
   - if [ $TRAVIS_OS_NAME == osx ] ; then defaults write com.apple.versioner.python Version $TRAVIS_PYTHON_VERSION || true ; fi
   - travis_retry pip install tox || pip install tox || true ;
   - travis_retry pip install coverage || true ;
   - travis_retry pip install codecov || true ;
   - travis_retry python -m pip install coverage || python -m pip install coverage || true ;
   - travis_retry python -m pip install codecov || python -m pip install codecov || true ;
-  - travis_retry python3 -m pip install tox || python3 -m pip install tox || true ;
-  - travis_retry python3 -m pip install coverage || python3 -m pip install coverage || true ;
-  - travis_retry python3 -m pip install codecov || python3 -m pip install codecov || true ;
-  - travis_retry python3 -m pip install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
+  - travis_retry python3 -m pip3 install tox || python3 -m pip install tox || true ;
+  - travis_retry python3 -m pip3 install coverage || python3 -m pip install coverage || true ;
+  - travis_retry python3 -m pip3 install codecov || python3 -m pip install codecov || true ;
+  - travis_retry python3 -m pip3 install -r requirements.txt || python3 -m pip install -r requirements.txt || true ;
 
 # The following is used to get coveralls working: add affter codecov
 #  - travis_retry pip install python-coveralls 2>/dev/null || python3 -m pip install python-coveralls || true ;
@@ -246,6 +246,7 @@ before_script:
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else curl -L --url https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 -o ./cc-test-reporter 3>/dev/null 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else chmod +x ./cc-test-reporter || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP code climate" ; else ./cc-test-reporter before-build || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] ; then echo "SKIP deepsource" ; else (curl https://deepsource.io/cli | sh) || true ; fi ;
 
 script:
   - make clean ;
@@ -261,6 +262,7 @@ after_failure:
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP coverage" ; else coverage combine 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP coverage xml" ; else coverage xml 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP codecov" ; else codecov 2>/dev/null || true ; fi ;
+  - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP deepsource" ; else ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] || [ $TRAVIS_PYTHON_VERSION == "3.3" ] ; then echo "SKIP codecov" ; else codecov 2>/dev/null || true ; fi ;
   - make clean 2>/dev/null || true
@@ -269,6 +271,7 @@ after_success:
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP coverage" ; else coverage combine 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP coverage xml" ; else coverage xml 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP code climate" ; else ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT || true ; fi ;
+  - if [ $TRAVIS_OS_NAME == osx ] || [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP deepsource" ; else ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; fi ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP codecov" ; else codecov || true ; fi ;
   - travis_retry python3 -m pip install python-coveralls || python3 -m pip install python-coveralls || true ;
   - if [ $TRAVIS_PYTHON_VERSION == "3.2" ] ; then echo "SKIP codecov" ; else coveralls 2>/dev/null || true ; fi ;

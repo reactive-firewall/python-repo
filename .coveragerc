@@ -7,7 +7,6 @@ include = pythonrepo*,tests*
 exclude_lines =
     # Have to re-enable the standard pragma
     pragma: no cover
-
     except Exception
     except BaseException:
     # Don't complain if tests don't hit defensive assertion code:
@@ -19,7 +18,7 @@ exclude_lines =
     except OSError
 
     # Don't complain if non-runnable code isn't run:
-	if __name__ in '__main__':
+    if __name__ in '__main__':
 
 ignore_errors = True
 

@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2022, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,7 +29,6 @@ except Exception as err:
 	print(str(""))
 	# Clean up Error
 	err = None
-	del(err)
 	# Throw more relevant Error
 	raise ImportError(str("Error Importing Python"))
 

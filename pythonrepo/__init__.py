@@ -17,13 +17,8 @@
 # limitations under the License.
 
 
-__package__ = """pythonrepo"""
-
-
 __module__ = """pythonrepo"""
-
-
-__name__ = """pythonrepo"""
+"""This is pythonrepo __module Template"""
 
 
 __version__ = """1.1.4"""
@@ -46,15 +41,7 @@ except Exception as err:
 	raise baton
 
 
-try:
-	from . import pythonrepo as pythonrepo
-except Exception as importErr:
-	del importErr
-	import pythonrepo.pythonrepo as pythonrepo
-
-
 if __name__ in '__main__':
 	if pythonrepo.__name__ is None:
 		raise ImportError(str("Failed to open pythonrepo"))
 	pythonrepo.main(sys.argv[1:])
-	exit(0)

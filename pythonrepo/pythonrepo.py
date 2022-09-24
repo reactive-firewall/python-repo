@@ -18,14 +18,11 @@
 # limitations under the License.
 
 
-__module__ = """pythonrepo"""
-
-
-# __name__ = """pythonrepo"""
+__module__ = """pythonrepo.pythonrepo"""
 
 
 try:
-	import sys
+	from . import sys
 	import argparse
 except Exception as err:
 	# Collect Error Info
@@ -53,7 +50,8 @@ __epilog__ = str(
 """Contains the short epilog of the program CLI help text."""
 
 
-__version__ = """1.1.4"""
+from . import __version__ as __version__
+# __version__ = """1.1.4"""
 """The version of this program."""
 
 
@@ -101,7 +99,6 @@ def parseArgs(arguments=None):
 
 def useTool(tool, *arguments):
 	"""Handler for launching the functions."""
-	# arguments = __checkToolArgs(arguments)
 	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
 		try:
 			# print(str("launching: " + tool))

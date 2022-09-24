@@ -41,5 +41,3 @@ except Exception as err:
 	raise baton
 
 
-if __name__ in '__main__':
-	pass

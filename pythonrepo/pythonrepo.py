@@ -34,7 +34,7 @@ except Exception as err:
 	raise baton
 
 
-from . import __version__ as __version__
+from . import __version__
 """The version of this program."""
 
 
@@ -131,6 +131,6 @@ def main(*argv):
 	exit(0)
 
 
-if __name__ == '__main__':
+if __name__ in '__main__':
 	if (sys.argv is not None) and (len(sys.argv) >= 1):
 		main(sys.argv[1:])

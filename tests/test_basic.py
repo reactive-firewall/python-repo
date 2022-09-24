@@ -68,16 +68,19 @@ class BasicTestSuite(unittest.TestCase):
 
 	def test_corner_case_example(self):
 		"""Example Test case for bad input directly into function."""
-		theResult = False
+		theResult = True
 		try:
 			from .context import pythonrepo
 			if pythonrepo.__name__ is None:
 				theResult = False
-			from pythonrepo import pythonrepo as pythonrepo
-			self.assertIsNone(pythonrepo.useTool(None))
-			self.assertIsNone(pythonrepo.useTool("JunkInput"))
-			theResult = True
+			from pythonrepo import pythonrepo as _pythonrepo
+			self.assertIsNone(_pythonrepo.useTool(None, None), """None, None Failed""")
+			self.assertIsNone(_pythonrepo.useTool(None, []), """None, [] Failed""")
+			self.assertIsNone(_pythonrepo.useTool(tool=None), """None Failed""")
+			self.assertIsNone(_pythonrepo.useTool("JunkInput"), """junk Failed""")
+			self.assertTrue(theResult)
 		except Exception:
+			self.fail("""Test Failed""")
 			theResult = False
 		assert theResult
 

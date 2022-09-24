@@ -19,6 +19,7 @@
 
 
 __module__ = """pythonrepo.pythonrepo"""
+"""This is pythonrepo component Template."""
 
 
 try:
@@ -132,5 +133,6 @@ def main(*argv):
 
 
 if __name__ in '__main__':
+	# deepsource overlooks the readability of "if main" type code here. (See PTC-W0048)
 	if (sys.argv is not None) and (len(sys.argv) >= 1):
 		main(sys.argv[1:])

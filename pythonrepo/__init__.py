@@ -18,7 +18,7 @@
 
 
 __module__ = """pythonrepo"""
-"""This is pythonrepo __module Template"""
+"""This is pythonrepo module Template."""
 
 
 __version__ = """1.1.4"""
@@ -39,5 +39,4 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	raise baton
-
 

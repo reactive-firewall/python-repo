@@ -42,6 +42,4 @@ except Exception as err:
 
 
 if __name__ in '__main__':
-	if pythonrepo.__name__ is None:
-		raise ImportError(str("Failed to open pythonrepo"))
-	pythonrepo.main(sys.argv[1:])
+	pass

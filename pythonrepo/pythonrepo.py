@@ -34,6 +34,10 @@ except Exception as err:
 	raise baton
 
 
+from . import __version__ as __version__
+"""The version of this program."""
+
+
 __prog__ = str(__module__)
 """The name of this program is PythonRepo"""
 
@@ -48,11 +52,6 @@ __epilog__ = str(
 	"""Add an epilog here."""
 )
 """Contains the short epilog of the program CLI help text."""
-
-
-from . import __version__ as __version__
-# __version__ = """1.1.4"""
-"""The version of this program."""
 
 
 # Add your functions here

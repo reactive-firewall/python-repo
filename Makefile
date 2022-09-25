@@ -59,6 +59,7 @@ PHONY: must_be_root cleanup
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile text 2>/dev/null || true
 
 init:
 	$(QUIET)$(ECHO) "$@: Done."
@@ -84,7 +85,7 @@ purge: clean uninstall
 test: cleanup
 	$(QUIET)coverage run -p --source=pythonrepo -m unittest discover --verbose -s ./tests -t ./ || python3 -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)coverage combine 2>/dev/null || true
-	$(QUIET)coverage report --include=pythonrepo* 2>/dev/null || true
+	$(QUIET)coverage report -m --include=pythonrepo* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
 	$(QUIET)$(ECHO) "$@: Done."
 

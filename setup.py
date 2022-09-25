@@ -25,7 +25,8 @@ except Exception:
 	raise ImportError("""Not Implemented.""")
 
 
-def readFile(filename="""./README.md"""):
+def readFile(filename):
+	"""Helper Function to read files"""
 	theResult = None
 	try:
 		with open(str("""./{}""").format(str(filename))) as f:
@@ -48,7 +49,7 @@ SLA = readFile("""LICENSE.md""")
 
 setup(
 	name="""pythonrepo""",
-	version="""1.1.2""",
+	version="""1.1.3""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

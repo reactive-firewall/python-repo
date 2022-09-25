@@ -101,8 +101,7 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:  # pragma: no branch
-
-		raise ImportError(str("[CWE-758] Profile module failed completely."))
+		raise ImportError(ImportErr, str("[CWE-758] Profile module failed completely."))
 except Exception as badErr:  # pragma: no branch
 	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__

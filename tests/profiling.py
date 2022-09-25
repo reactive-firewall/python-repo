@@ -29,6 +29,10 @@
 # NO ASSOCIATION
 
 
+__module__ = """tests.profiling"""
+"""This is pythonrepo testing module Template."""
+
+
 try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
@@ -46,6 +50,19 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
+
+
+try:
+	if 'functools' not in sys.modules:
+		import functools
+	else:  # pragma: no branch
+		functools = sys.modules["""functools"""]
 except Exception as badErr:  # pragma: no branch
 	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__
@@ -150,8 +167,6 @@ def do_time_profile(func, timer_name="time_profile"):
 		>>>
 
 	"""
-	import functools
-
 	@functools.wraps(func)
 	def timer_profile_func(*args, **kwargs):
 		"""Wraps a function in timewith() function."""
@@ -196,7 +211,9 @@ def do_cprofile(func):
 
 
 	"""
+	@functools.wraps(func)
 	def profiled_func(*args, **kwargs):
+		"""Wraps a function in profile.enable/disable() functions."""
 		profile = cProfile.Profile()
 		try:
 			profile.enable()
@@ -242,7 +259,7 @@ except ImportError:  # pragma: no cover
 		return inner
 
 
-def main(argv=None):  # pragma: no cover
+def main(*argv):  # pragma: no cover
 	"""The Main Event makes no sense to profiling."""
 	raise NotImplementedError("CRITICAL - test profiling main() not implemented. yet?")
 

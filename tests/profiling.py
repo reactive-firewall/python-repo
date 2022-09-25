@@ -33,8 +33,12 @@ try:
 	import sys
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] OMG! we could not import sys! ABORT. ABORT.")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
@@ -42,26 +46,37 @@ try:
 		import os
 	else:  # pragma: no branch
 		os = sys.modules["""os"""]
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-758] OS Failed to import.")
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
 	import time
 	if time.__name__ is None:  # pragma: no branch
 		raise NotImplementedError("[CWE-440] We could not import time. Are we in the speed-force!")
-except Exception as err:
-	raise ImportError(err)
-	exit(3)
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
-	import cProfile
-	if cProfile.__name__ is None:  # pragma: no branch
-		raise NotImplementedError("[CWE-440] We could not import cProfile. ABORT!")
-except Exception as err:  # pragma: no branch
-	raise ImportError(err)
-	exit(3)
+	if 'cProfile' not in sys.modules:
+		import cProfile
+	else:  # pragma: no branch
+			cProfile = sys.modules["""cProfile"""]
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
@@ -69,16 +84,14 @@ try:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('.'))))
 	except Exception as ImportErr:  # pragma: no branch
-		print(str(''))
-		print(str(type(ImportErr)))
-		print(str(ImportErr))
-		print(str((ImportErr.args)))
-		print(str(''))
-		ImportErr = None
-		del ImportErr
+
 		raise ImportError(str("[CWE-758] Profile module failed completely."))
-except Exception:  # pragma: no branch
-	raise ImportError("[CWE-440] Failed to import test profiling")
+except Exception as badErr:  # pragma: no branch
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 class timewith():

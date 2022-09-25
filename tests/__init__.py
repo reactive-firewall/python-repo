@@ -37,11 +37,8 @@ try:
 	if test_basic.__name__ is None:
 		raise ImportError(str("Test module failed to import even the basic tests."))
 except Exception as badErr:
-	print(str(''))
-	print(str(type(badErr)))
-	print(str(badErr))
-	print(str((badErr.args)))
-	print(str(''))
-	badErr = None
-	del badErr
-	exit(0)
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton

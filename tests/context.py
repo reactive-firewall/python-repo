@@ -22,21 +22,21 @@ try:
 	import os
 	if 'pythonrepo' in __file__:
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-except Exception as ImportErr:
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
-	ImportErr = None
-	del ImportErr
-	raise ImportError("Python Repo Failed to Import")
+except Exception as badErr:
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton
 
 
 try:
 	import pythonrepo as pythonrepo
 	if pythonrepo.__name__ is None:
 		raise ImportError("Failed to import pythonrepo.")
-except Exception as importErr:
-	importErr = None
-	del importErr
-	raise ImportError("Test module failed to load pythonrepo for test.")
-	exit(0)
+except Exception as badErr:
+	baton = ImportError(badErr, str("[CWE-758] Test module failed to load pythonrepo for test."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton

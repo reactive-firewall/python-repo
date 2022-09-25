@@ -164,7 +164,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanity Test. if ( is true ) usage."""
-		assert True
+		self.assertTrue(True)
 
 	def test_syntax(self):
 		"""Test case importing code. if ( import is not None ) usage."""
@@ -178,7 +178,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 			print(str(type(impErr)))
 			print(str(impErr))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_template_case(self):
 		"""Test case template for: python -m pythonrepo.* --version usage."""
@@ -217,7 +217,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				err = None
 				del err
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_profile_template_case(self):
 		"""Test case template for profiling."""
@@ -255,7 +255,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				err = None
 				del err
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	@unittest.expectedFailure
 	def test_fail_template_case(self):
@@ -294,7 +294,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				err = None
 				del err
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	@unittest.expectedFailure
 	def test_bad_template_case(self):
@@ -333,7 +333,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				err = None
 				del err
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 
 if __name__ == '__main__':

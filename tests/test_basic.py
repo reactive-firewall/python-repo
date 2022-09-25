@@ -47,7 +47,7 @@ class BasicTestSuite(unittest.TestCase):
 			print(str(type(impErr)))
 			print(str(impErr))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_the_help_command(self):
 		"""Test case for backend library."""
@@ -64,7 +64,7 @@ class BasicTestSuite(unittest.TestCase):
 			theResult = True
 		except Exception:
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_corner_case_example(self):
 		"""Example Test case for bad input directly into function."""
@@ -82,7 +82,7 @@ class BasicTestSuite(unittest.TestCase):
 		except Exception:
 			self.fail("""Test Failed""")
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_new_tests(self):
 		"""Try adding new tests."""

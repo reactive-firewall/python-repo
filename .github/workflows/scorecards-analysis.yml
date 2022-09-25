@@ -1,5 +1,5 @@
 name: Scorecards supply-chain security
-on: 
+on:
   # Only the default branch is supported.
   branch_protection_rule:
   schedule:
@@ -17,7 +17,7 @@ jobs:
     permissions:
       # Needed to upload the results to code-scanning dashboard.
       security-events: write
-    
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@ec3a7ce113134d7a93b817d10a8272cb61118579 # v2.4.0
@@ -34,7 +34,7 @@ jobs:
           repo_token: ${{ secrets.SCORECARD_TOKEN }}
           # Publish the results to enable scorecard badges. For more details, see
           # https://github.com/ossf/scorecard-action#publishing-results.
-          # If you are installing the action on a private repo, set it to `publish_results: false` 
+          # If you are installing the action on a private repo, set it to `publish_results: false`
           # or comment out the following line.
           publish_results: true
 
@@ -45,7 +45,7 @@ jobs:
           name: SARIF file
           path: results.sarif
           retention-days: 5
-      
+
       # Upload the results to GitHub's code scanning dashboard.
       - name: "Upload to code-scanning"
         uses: github/codeql-action/upload-sarif@5f532563584d71fdef14ee64d17bafb34f751ce5 # v1.0.26

@@ -87,7 +87,7 @@ try:
 	if 'cProfile' not in sys.modules:
 		import cProfile
 	else:  # pragma: no branch
-			cProfile = sys.modules["""cProfile"""]
+		cProfile = sys.modules["""cProfile"""]
 except Exception as badErr:  # pragma: no branch
 	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
 	baton.module = __module__

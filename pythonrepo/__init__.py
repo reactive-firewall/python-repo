@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python Repo."""
 
 __module__ = """pythonrepo"""
 """This is pythonrepo module Template."""
@@ -39,4 +40,3 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	raise baton
-

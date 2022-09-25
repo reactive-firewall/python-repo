@@ -47,6 +47,7 @@ coverage.xml
 codecov_env
 *,cover
 .hypothesis/
+test-reports/*
 
 # Translations
 *.mo

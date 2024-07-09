@@ -2,7 +2,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -66,6 +66,11 @@ init:
 
 install: must_be_root
 	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/pythonrepo.git#egg=pythonrepo"
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+user-install: must_be_root
+	$(QUIET)python3 -m pip install --user "git+https://github.com/reactive-firewall/pythonrepo.git#egg=pythonrepo"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 

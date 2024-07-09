@@ -65,12 +65,12 @@ init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/pythonrepo.git#egg=pythonrepo"
+	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/python-repo.git#egg=pythonrepo"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 user-install:
-	$(QUIET)python3 -m pip install --user "git+https://github.com/reactive-firewall/pythonrepo.git#egg=pythonrepo"
+	$(QUIET)python3 -m pip install --user "git+https://github.com/reactive-firewall/python-repo.git#egg=pythonrepo"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 

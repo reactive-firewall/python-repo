@@ -69,7 +69,7 @@ install: must_be_root
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
-user-install: must_be_root
+user-install:
 	$(QUIET)python3 -m pip install --user "git+https://github.com/reactive-firewall/pythonrepo.git#egg=pythonrepo"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."

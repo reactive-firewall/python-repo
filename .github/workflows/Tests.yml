@@ -245,7 +245,7 @@ jobs:
       run: make -j1 -f Makefile clean || true ;
       if: ${{ always() }}
 
-COVERAGE:
+  COVERAGE:
     if: ${{ success() }}
     needs: [BUILD, MATS, COVERAGE-MATS]
     runs-on: ${{ matrix.os }}

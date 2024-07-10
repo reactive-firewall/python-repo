@@ -12,7 +12,7 @@ on:
   schedule:
     - cron: '18 9 * * 5'
   push:
-    branches: [ master, score-card-revert-patch ]
+    branches: [ master ]
 
 # Declare default permissions as read only.
 permissions: read-all

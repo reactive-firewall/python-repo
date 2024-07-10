@@ -12,7 +12,7 @@ on:
   schedule:
     - cron: '18 9 * * 5'
   push:
-    branches: [ "master", "score-card-revert-patch" ]
+    branches: [ master, score-card-revert-patch ]
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -27,8 +27,8 @@ jobs:
       # Needed to publish results and get a badge (see publish_results below).
       id-token: write
       # Uncomment the permissions below if installing in a private repository.
-      # contents: read
-      # actions: read
+      contents: read
+      actions: read
 
     steps:
       - name: "Checkout code"

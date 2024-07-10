@@ -22,7 +22,8 @@ exclude_patterns = [
     ".coveralls.yml",
     "codecov_env",
     "*,cover",
-    ".hypothesis/"
+    ".hypothesis/",
+    "docs/"
 ]
 
 [[analyzers]]

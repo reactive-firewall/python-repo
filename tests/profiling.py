@@ -268,5 +268,5 @@ if __name__ in '__main__':  # pragma: no cover
 	try:
 		exitcode = main(sys.argv[1:])
 	finally:
-		exit(exitcode)
+		sys.exit(exitcode)
 

@@ -99,9 +99,8 @@ def parseArgs(arguments=None):
 
 def useTool(tool, *arguments):
 	"""Handler for launching the functions."""
-	if (tool is not None) and (tool in TASK_OPTIONS.keys()):
+	if (tool is not None) and (tool in TASK_OPTIONS):
 		try:
-			# print(str("launching: " + tool))
 			TASK_OPTIONS[tool](arguments)
 		except Exception:
 			w = str("WARNING - An error occured while")
@@ -123,13 +122,13 @@ def main(*argv):
 			w += str("handling the arguments.")
 			w += str(" Cascading failure.")
 			print(w)
-			exit(2)
+			sys.exit(2)
 	except Exception:
 		e = str("CRITICAL - An error occured while handling")
 		e += str("the cascading failure.")
 		print(e)
-		exit(3)
-	exit(0)
+		sys.exit(3)
+	sys.exit(0)
 
 
 if __name__ in '__main__':

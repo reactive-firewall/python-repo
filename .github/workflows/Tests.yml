@@ -7,6 +7,9 @@ on:
     tags:
       - v*
 
+# Declare default permissions as read only.
+permissions: read-all
+
 jobs:
   BUILD:
     if: github.repository == 'reactive-firewall/python-repo'

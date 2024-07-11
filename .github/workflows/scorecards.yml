@@ -12,7 +12,7 @@ on:
   schedule:
     - cron: '18 9 * * 5'
   push:
-    branches: [ "master" ]
+    branches: [ master ]
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -27,8 +27,8 @@ jobs:
       # Needed to publish results and get a badge (see publish_results below).
       id-token: write
       # Uncomment the permissions below if installing in a private repository.
-      # contents: read
-      # actions: read
+      contents: read
+      actions: read
 
     steps:
       - name: "Checkout code"
@@ -46,7 +46,6 @@ jobs:
           # - you are installing Scorecard on a *private* repository
           # To create the PAT, follow the steps in https://github.com/ossf/scorecard-action?tab=readme-ov-file#authentication-with-fine-grained-pat-optional.
           repo_token: ${{ secrets.SCORECARD_TOKEN }}
-
           # Public repositories:
           #   - Publish results to OpenSSF REST API for easy access by consumers
           #   - Allows the repository to include the Scorecard badge.

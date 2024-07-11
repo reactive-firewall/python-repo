@@ -23,7 +23,7 @@ exclude_patterns = [
     "codecov_env",
     "*,cover",
     ".hypothesis/",
-    "docs/"
+    "docs/conf.py"
 ]
 
 [[analyzers]]

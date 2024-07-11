@@ -4,6 +4,9 @@ on:
     types: [opened, reopened]
     branches: [ master, stable ]
 
+# Declare default permissions as none.
+permissions: none
+
 jobs:
   triage:
     permissions:

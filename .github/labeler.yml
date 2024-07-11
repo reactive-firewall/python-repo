@@ -1,53 +1,60 @@
 # Add 'Python Repo' label to any root file changes
 Python Repo:
   - changed-files:
-    - any-glob-to-any-file: 'setup.py'
-    - any-glob-to-any-file: 'pythonrepo/*.py'
+    - any-glob-to-any-file:
+      - setup.py
+      - pythonrepo/*.py
 
 # Add 'Lint' label to any lint file changes
 Linter:
   - changed-files:
-    - any-glob-to-any-file: '.stickler.yml'
-    - any-glob-to-any-file: '.hound.yml'
-    - any-glob-to-any-file: '.yamllint.conf'
-    - any-glob-to-any-file: '.flake8.ini'
-    - any-glob-to-any-file: '.deepsource.toml'
-    - any-glob-to-any-file: 'tests/check_*'
+    - any-glob-to-any-file:
+      - .stickler.yml
+      - .hound.yml
+      - .yamllint.conf
+      - .flake8.ini
+      - .deepsource.toml
+      - tests/check_*
 
 # Add 'Lang' label to any python file changes
 Python Lang:
   - changed-files:
-    - any-glob-to-any-file: '**/*.py'
-    - any-glob-to-any-file: '*.py'
+    - any-glob-to-any-file:
+      - '**/*.py'
+      - '*.py'
 
 Configs:
   - changed-files:
-    - any-glob-to-any-file: '*.yml'
-    - any-glob-to-any-file: './**/*.yml'
-    - any-glob-to-any-file: '*.ini'
-    - any-glob-to-any-file: '*.toml'
-    - any-glob-to-any-file: '*.cfg'
-    - any-glob-to-any-file: 'requirements.txt'
+    - any-glob-to-any-file:
+      - '*.yml'
+      - ./**/*.yml
+      - '*.ini'
+      - '*.toml'
+      - '*.cfg'
+      - requirements.txt
 
 # Add 'test' label
 Testing:
   - changed-files:
-    - any-glob-to-any-file: 'tests/**/*.py'
-    - any-glob-to-any-file: 'tests/*'
-    - any-glob-to-any-file: '.circleci/*'
+    - any-glob-to-any-file:
+      - tests/**/*.py
+      - tests/*
+      - .circleci/*
 
 CI:
   - changed-files:
-    - any-glob-to-any-file: 'tests/*.py'
-    - any-glob-to-any-file: '.stickler.yml'
-    - any-glob-to-any-file: '.hound.yml'
-    - any-glob-to-any-file: '.travis.yml'
-    - any-glob-to-any-file: '.appveyor.yml'
-    - any-glob-to-any-file: '.github/workflows/*'
-    - any-glob-to-any-file: '.circleci/*'
+    - any-glob-to-any-file:
+      - tests/*.py
+      - .stickler.yml
+      - .hound.yml
+      - .travis.yml
+      - .appveyor.yml
+      - .github/workflows/*
+      - .circleci/*
 
 Github:
   - changed-files:
-    - any-glob-to-any-file: '.github/**/*'
-    - any-glob-to-any-file: '.github/*'
-    - any-glob-to-any-file: 'README.md'
+    - any-glob-to-any-file:
+      - .github/**/*
+      - .github/*
+      - README.md

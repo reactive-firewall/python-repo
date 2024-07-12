@@ -6,6 +6,24 @@ on:
       - stable
     tags:
       - v*
+  pull_request:
+    types:
+      - opened
+      - edited
+      - reopened
+      - ready_for_review
+    branches-ignore:
+      - '*-patc*'
+  pull_request_target:
+    types:
+      - opened
+      - edited
+      - reopened
+      - synchronize
+      - ready_for_review
+    branches:
+      - master
+      - stable
 
 # Declare default permissions as read only.
 permissions: read-all

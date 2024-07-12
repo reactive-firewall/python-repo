@@ -5,8 +5,7 @@ on:
     branches: [ master, stable ]
 
 # Declare default permissions as none.
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   triage:

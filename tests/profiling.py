@@ -132,7 +132,7 @@ class timewith():
 	def __enter__(self):
 		return self
 
-	def __exit__(self, type, value, traceback):
+	def __exit__(self, type, value, traceback):  # skipcq: PLY-W0622
 		self.checkpoint(str("finished"))
 		pass
 

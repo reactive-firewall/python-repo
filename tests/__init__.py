@@ -36,10 +36,10 @@ try:
 		ImportErr = None
 		del ImportErr
 		raise ImportError(str("Test module failed completely."))
-	from tests import context as context
+	from tests import context as context  # skipcq: PYL-C0414
 	if context.__name__ is None:
 		raise ImportError(str("Test module failed to import even the context framework."))
-	from tests import profiling as profiling
+	from tests import profiling as profiling  # skipcq: PYL-C0414
 	if profiling.__name__ is None:
 		raise ImportError(str("Test module failed to import even the profiling framework."))
 	from tests import test_basic

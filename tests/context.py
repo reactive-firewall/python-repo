@@ -35,7 +35,7 @@ except Exception as badErr:
 
 
 try:
-	import pythonrepo as pythonrepo
+	import pythonrepo as pythonrepo  # skipcq: PYL-C0414
 	if pythonrepo.__name__ is None:
 		raise ImportError("Failed to import pythonrepo.")
 except Exception as badErr:

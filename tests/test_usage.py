@@ -215,7 +215,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
 		self.assertTrue(theResult)
 
@@ -253,7 +253,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
 		self.assertTrue(theResult)
 
@@ -292,7 +292,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
 		self.assertTrue(theResult)
 
@@ -331,7 +331,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
 		self.assertTrue(theResult)
 

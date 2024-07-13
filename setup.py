@@ -30,8 +30,8 @@ def readFile(filename):
 	theResult = None
 	if filename in ("""README.md""", """LICENSE.md"""):
 		try:
-			with open(str("""./{}""").format(str(filename))) as f:
-				theResult = f.read()
+			with open(str("""./{}""").format(str(filename))) as file:
+				theResult = file.read()
 		except Exception:
 			theResult = str(
 				"""See https://github.com/reactive-firewall/python-repo/{}"""

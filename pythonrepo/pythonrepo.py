@@ -36,7 +36,6 @@ except Exception as err:
 
 
 from . import __version__
-"""The version of this program."""
 
 
 __prog__ = str(__module__)

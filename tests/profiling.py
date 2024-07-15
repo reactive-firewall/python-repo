@@ -135,7 +135,6 @@ class timewith():
 
 	def __exit__(self, type, value, traceback):  # skipcq: PYL-W0622
 		self.checkpoint(str("finished"))
-		pass
 
 
 def do_time_profile(func, timer_name="time_profile"):

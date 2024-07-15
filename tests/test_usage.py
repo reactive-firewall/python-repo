@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -57,7 +57,7 @@ def buildPythonCommand(args=None):
 	# you need to change this to the name of your project
 	__project__ = str("pythonrepo")
 	try:
-		if args is None or args is [None]:
+		if args is None or (args == [None]):
 			theArgs = ["exit 1 ; #"]
 		else:
 			theArgs = args
@@ -166,7 +166,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanity Test. if ( is true ) usage."""
-		self.assertTrue(True)
+		self.assertTrue(True)  # skipcq: PYL-W1503
 
 	def test_syntax(self):
 		"""Test case importing code. if ( import is not None ) usage."""

@@ -112,6 +112,7 @@ except Exception as badErr:  # pragma: no branch
 
 class timewith():
 	"""Basic timer for do_time_profile."""
+
 	def __init__(self, name=''):
 		self.name = name
 		self.start = time.time()

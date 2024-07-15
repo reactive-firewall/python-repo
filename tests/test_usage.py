@@ -166,7 +166,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	def test_absolute_truth_and_meaning(self):
 		"""Insanity Test. if ( is true ) usage."""
-		self.assertTrue(True)
+		self.assertTrue(True)  # skipcq: PYL-W1503
 
 	def test_syntax(self):
 		"""Test case importing code. if ( import is not None ) usage."""

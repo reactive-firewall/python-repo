@@ -27,11 +27,12 @@ class BasicTestSuite(unittest.TestCase):
 	def test_absolute_truth_and_meaning(self):
 		"""Insanitty Test. Because it only matters if we're not mad as hatters."""
 		assert True
+		self.assertTrue(True)  # skipcq: PYL-W1503
 
 	def test_meta_test(self):
 		"""Insanity Test for unittests assertion."""
-		self.assertTrue(True)
-		self.assertFalse(False)
+		self.assertTrue(True)  # skipcq: PYL-W1503
+		self.assertFalse(False)  # skipcq: PYL-W1503
 		self.assertIsNone(None)
 
 	def test_syntax(self):

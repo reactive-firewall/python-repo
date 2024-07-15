@@ -2,7 +2,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,6 +15,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+"""Python Repo Testing Module."""
+
+__module__ = """tests"""
+"""This is pythonrepo testing module Template."""
+
 
 try:
 	try:
@@ -30,18 +36,18 @@ try:
 		ImportErr = None
 		del ImportErr
 		raise ImportError(str("Test module failed completely."))
-	from tests import profiling as profiling
+	from tests import context as context  # skipcq: PYL-C0414
+	if context.__name__ is None:
+		raise ImportError(str("Test module failed to import even the context framework."))
+	from tests import profiling as profiling  # skipcq: PYL-C0414
 	if profiling.__name__ is None:
 		raise ImportError(str("Test module failed to import even the profiling framework."))
 	from tests import test_basic
 	if test_basic.__name__ is None:
 		raise ImportError(str("Test module failed to import even the basic tests."))
 except Exception as badErr:
-	print(str(''))
-	print(str(type(badErr)))
-	print(str(badErr))
-	print(str((badErr.args)))
-	print(str(''))
-	badErr = None
-	del badErr
-	exit(0)
+	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = badErr
+	raise baton

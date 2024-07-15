@@ -1,17 +1,44 @@
+codecov:
+  notify:
+    wait_for_ci: true
+  require_ci_to_pass: true
+comment:
+  behavior: default
+  layout: reach, diff, flags, files, footer
+  require_base: false
+  require_changes: false
+  require_head: true
+  show_carryforward_flags: false
 coverage:
+  precision: 3
+  round: nearest
   status:
+    changes: false
+    default_rules:
+      flag_coverage_not_uploaded_behavior: include
+    patch: true
     project:
-      default: on
+      default:
         target: 95%
         base: auto
+        branches:
+          - master
+          - stable
+        if_ci_failed: ignore
+        only_pulls: false
+        removed_code_behavior: adjust_base
       tests:
         target: 80%
-        flags: tests
+        if_ci_failed: failure
+        only_pulls: false
+        removed_code_behavior: fully_covered_patch
+        flags:
+          - tests
         paths:
           - tests
-
+github_checks:
+  annotations: true
 flags:
   tests:
     paths:
       - tests
-    joined: false

@@ -2,9 +2,12 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/python:3.6.1
-      - image: circleci/python:3.7
-      - image: circleci/python:3.8
+      - image: cimg/python:3.7
+      - image: cimg/python:3.8
+      - image: cimg/python:3.9
+      - image: cimg/python:3.10
+      - image: cimg/python:3.11
+      - image: cimg/python:3.12
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive
@@ -41,9 +44,12 @@ jobs:
 
   test:
     docker:
-      - image: circleci/python:3.6.1
-      - image: circleci/python:3.7
-      - image: circleci/python:3.8
+      - image: cimg/python:3.7
+      - image: cimg/python:3.8
+      - image: cimg/python:3.9
+      - image: cimg/python:3.10
+      - image: cimg/python:3.11
+      - image: cimg/python:3.12
     parallelism: 2
     environment:
       CI: cicleci
@@ -88,9 +94,12 @@ jobs:
 
   pytest:
     docker:
-      - image: circleci/python:3.6.1
-      - image: circleci/python:3.7
-      - image: circleci/python:3.8
+      - image: cimg/python:3.7
+      - image: cimg/python:3.8
+      - image: cimg/python:3.9
+      - image: cimg/python:3.10
+      - image: cimg/python:3.11
+      - image: cimg/python:3.12
     parallelism: 2
     environment:
       CI: cicleci
@@ -147,7 +156,7 @@ jobs:
 
   lint:
     docker:
-      - image: circleci/python:3.6.1
+      - image: cimg/python:3.11
     environment:
       CI: cicleci
       DEBIAN_FRONTEND: noninteractive

@@ -112,6 +112,7 @@ except Exception as badErr:  # pragma: no branch
 
 class timewith():
 	"""Basic timer for do_time_profile."""
+
 	def __init__(self, name=''):
 		self.name = name
 		self.start = time.time()
@@ -132,7 +133,7 @@ class timewith():
 	def __enter__(self):
 		return self
 
-	def __exit__(self, type, value, traceback):  # skipcq: PLY-W0622
+	def __exit__(self, type, value, traceback):  # skipcq: PYL-W0622
 		self.checkpoint(str("finished"))
 		pass
 

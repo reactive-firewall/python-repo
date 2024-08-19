@@ -1,4 +1,4 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Python Repo Template
@@ -65,7 +65,7 @@ def NoOp(*args, **kwargs):
 # More boiler-plate-code
 
 
-TASK_OPTIONS = dict({
+TASK_OPTIONS = dict({  # skipcq: PTC-W0020
 	'noop': NoOp
 })
 """The callable function tasks of this program."""

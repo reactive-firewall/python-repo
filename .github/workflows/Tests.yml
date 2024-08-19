@@ -225,7 +225,7 @@ jobs:
       if: ${{ runner.python-version }} != "3.9"
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
@@ -235,7 +235,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
@@ -309,7 +309,7 @@ jobs:
       if: ${{ runner.python-version }} != "3.9"
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
@@ -319,7 +319,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
@@ -430,7 +430,7 @@ jobs:
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
       shell: bash
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/coverage_supplement.xml
@@ -440,7 +440,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Extra Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Integration-Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/

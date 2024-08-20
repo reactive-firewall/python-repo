@@ -4,6 +4,8 @@ Python Repo:
     - any-glob-to-any-file:
       - setup.py
       - pythonrepo/*.py
+      - LICENSE
+      - LICENSE.md
 
 # Add 'Lint' label to any lint file changes
 Linter:

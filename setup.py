@@ -50,7 +50,7 @@ SLA = readFile("""LICENSE.md""")
 
 setup(
 	name="""pythonrepo""",
-	version="""1.1.3""",
+	version="""1.1.4""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

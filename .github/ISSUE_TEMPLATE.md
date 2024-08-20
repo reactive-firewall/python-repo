@@ -9,7 +9,7 @@
 >>  `uname -a`
   - [ ] linux
   - [ ] MacOS (darwin)
-- `multicast` version:
+- `<Project>` version:
 >> `python3 -m pythonrepo.pythonrepo --version`
 
 

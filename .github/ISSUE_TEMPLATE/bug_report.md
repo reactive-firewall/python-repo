@@ -2,7 +2,7 @@
 name: Bug report
 about: Create a report to help us improve
 title: ''
-labels: Bug, Failing
+labels: Bug, Testing
 assignees: reactive-firewall
 
 ---
@@ -26,11 +26,11 @@ If applicable, add logs here to help explain your problem.
 **Screenshots** _(optional)_
 If applicable, add screenshots to help explain your problem.
 
-**PiAP Device (please complete the following information):**
+**Reporter's Device (please complete the following information):**
  - OS: [e.g. macOS]
  - OS Version: [e.g. 22]
  - Python Version [e.g. 3.9] _(optional)_
- - Python Template Version: [e.g. v0.5.0]
+ - Python Template Version: [e.g. v1.5.0]
 
 **Additional context** _(optional)_
 Add any other context about the problem here.

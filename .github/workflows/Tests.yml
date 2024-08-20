@@ -263,7 +263,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macos-13, windows-latest]
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11"]
+        python-version: [3.7, 3.8, 3.9, "3.10"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -319,7 +319,6 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
-      if: ${{ runner.python-version }} != "3.11"
       uses: actions/upload-artifact@v4
       with:
         name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}

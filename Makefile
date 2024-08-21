@@ -2,7 +2,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -59,12 +59,18 @@ PHONY: must_be_root cleanup
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile text 2>/dev/null || true
 
 init:
 	$(QUIET)$(ECHO) "$@: Done."
 
 install: must_be_root
-	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/pythonrepo.git#egg=pythonrepo"
+	$(QUIET)python3 -m pip install "git+https://github.com/reactive-firewall/python-repo.git#egg=pythonrepo"
+	$(QUITE)$(WAIT)
+	$(QUIET)$(ECHO) "$@: Done."
+
+user-install:
+	$(QUIET)python3 -m pip install --user "git+https://github.com/reactive-firewall/python-repo.git#egg=pythonrepo"
 	$(QUITE)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -84,7 +90,7 @@ purge: clean uninstall
 test: cleanup
 	$(QUIET)coverage run -p --source=pythonrepo -m unittest discover --verbose -s ./tests -t ./ || python3 -m unittest discover --verbose -s ./tests -t ./ || python -m unittest discover --verbose -s ./tests -t ./ || DO_FAIL=exit 2 ;
 	$(QUIET)coverage combine 2>/dev/null || true
-	$(QUIET)coverage report --include=pythonrepo* 2>/dev/null || true
+	$(QUIET)coverage report -m --include=pythonrepo* 2>/dev/null || true
 	$(QUIET)$(DO_FAIL);
 	$(QUIET)$(ECHO) "$@: Done."
 

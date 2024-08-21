@@ -1,8 +1,9 @@
+#! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -16,37 +17,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Python Repo."""
 
-__version__ = """1.1.1"""
-"""This is version 1.1.1 of pythonrepo Template"""
+__module__ = """pythonrepo"""
+"""This is pythonrepo module Template."""
+
+
+__version__ = """1.1.4"""
+"""This is version 1.1.4 of pythonrepo Template"""
 
 
 try:
 	import sys
 	import os
-	if 'pythonrepo' in __file__:
+	if str(__module__) in __file__:
 		__parentPath = os.path.join(
 			os.path.dirname(__file__), '..'
 		)
 		sys.path.insert(0, os.path.abspath(__parentPath))
-except Exception as ImportErr:
-	print(str(type(ImportErr)))
-	print(str(ImportErr))
-	print(str((ImportErr.args)))
-	ImportErr = None
-	del ImportErr
-	raise ImportError(str("pythonrepo Failed to Import"))
-
-
-try:
-	from . import pythonrepo as pythonrepo
-except Exception as importErr:
-	del importErr
-	import pythonrepo.pythonrepo as pythonrepo
-
-
-if __name__ in '__main__':
-	if pythonrepo.__name__ is None:
-		raise ImportError(str("Failed to open pythonrepo"))
-	pythonrepo.main(sys.argv[1:])
-	exit(0)
+except Exception as err:
+	baton = ImportError(err, str("[CWE-758] Module failed completely."))
+	baton.module = __module__
+	baton.path = __file__
+	baton.__cause__ = err
+	raise baton

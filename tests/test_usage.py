@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2019, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -52,12 +52,12 @@ def getPythonCommand():
 
 
 def buildPythonCommand(args=None):
-	"""Function for building backend subprocess command line"""
+	"""Function for building backend subprocess command line."""
 	theArgs = args
 	# you need to change this to the name of your project
 	__project__ = str("pythonrepo")
 	try:
-		if args is None or args is [None]:
+		if args is None or (args == [None]):
 			theArgs = ["exit 1 ; #"]
 		else:
 			theArgs = args
@@ -80,7 +80,7 @@ def buildPythonCommand(args=None):
 
 
 def checkPythonCommand(args=None, stderr=None):
-	"""Function for backend subprocess check_output command like testing with coverage support"""
+	"""Function for backend subprocess check_output command like testing with coverage support."""
 	theOutput = None
 	try:
 		taintArgs = buildPythonCommand(args)
@@ -97,8 +97,10 @@ def checkPythonCommand(args=None, stderr=None):
 
 @profiling.do_cprofile
 def timePythonCommand(args=None, stderr=None):
-	"""Function for backend subprocess check_output command
-	with support for coverage and profiling."""
+	"""
+	Function for backend subprocess check_output command
+	with support for coverage and profiling.
+	"""
 	if args is None:
 		args = [None]
 	return checkPythonCommand(args, stderr)
@@ -163,11 +165,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
 
 	def test_absolute_truth_and_meaning(self):
-		"""Insanity Test. if ( is true ) """
-		assert True
+		"""Insanity Test. if ( is true ) usage."""
+		self.assertTrue(True)  # skipcq: PYL-W1503
 
 	def test_syntax(self):
-		"""Test case importing code. if ( import is not None ) """
+		"""Test case importing code. if ( import is not None ) usage."""
 		theResult = False
 		try:
 			from .context import pythonrepo
@@ -178,10 +180,10 @@ class BasicUsageTestSuite(unittest.TestCase):
 			print(str(type(impErr)))
 			print(str(impErr))
 			theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_template_case(self):
-		"""Test case template for: python -m pythonrepo.* --version """
+		"""Test case template for: python -m pythonrepo.* --version usage."""
 		theResult = False
 		thepython = getPythonCommand()
 		if (thepython is not None):
@@ -215,12 +217,12 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	def test_profile_template_case(self):
-		"""Test case template for profiling"""
+		"""Test case template for profiling."""
 		theResult = False
 		thepython = getPythonCommand()
 		if (thepython is not None):
@@ -253,13 +255,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	@unittest.expectedFailure
 	def test_fail_template_case(self):
-		"""Test case template for profiling"""
+		"""Test case template for profiling."""
 		theResult = False
 		thepython = getPythonCommand()
 		if (thepython is not None):
@@ -292,13 +294,13 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 	@unittest.expectedFailure
 	def test_bad_template_case(self):
-		"""Test case template for profiling"""
+		"""Test case template for profiling."""
 		theResult = False
 		thepython = getPythonCommand()
 		if (thepython is not None):
@@ -331,9 +333,9 @@ class BasicUsageTestSuite(unittest.TestCase):
 				print(str((err.args)))
 				print(str(""))
 				err = None
-				del err
+				del err  # skipcq: PTC-W0043
 				theResult = False
-		assert theResult
+		self.assertTrue(theResult)
 
 
 if __name__ == '__main__':

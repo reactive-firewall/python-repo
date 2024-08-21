@@ -1,0 +1,62 @@
+# Add 'Python Repo' label to any root file changes
+Python Repo:
+  - changed-files:
+    - any-glob-to-any-file:
+      - setup.py
+      - pythonrepo/*.py
+      - LICENSE
+      - LICENSE.md
+
+# Add 'Lint' label to any lint file changes
+Linter:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .stickler.yml
+      - .hound.yml
+      - .yamllint.conf
+      - .flake8.ini
+      - .deepsource.toml
+      - tests/check_*
+
+# Add 'Lang' label to any python file changes
+Python Lang:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '**/*.py'
+      - '*.py'
+
+Configs:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.yml'
+      - ./**/*.yml
+      - '*.ini'
+      - '*.toml'
+      - '*.cfg'
+      - requirements.txt
+
+# Add 'test' label
+Testing:
+  - changed-files:
+    - any-glob-to-any-file:
+      - tests/**/*.py
+      - tests/*
+      - .circleci/*
+
+CI:
+  - changed-files:
+    - any-glob-to-any-file:
+      - tests/*.py
+      - .stickler.yml
+      - .hound.yml
+      - .travis.yml
+      - .appveyor.yml
+      - .github/workflows/*
+      - .circleci/*
+
+Github:
+  - changed-files:
+    - any-glob-to-any-file:
+      - .github/**/*
+      - .github/*
+      - README.md

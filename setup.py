@@ -25,15 +25,17 @@ except Exception:
 	raise ImportError("""Not Implemented.""")
 
 
-def readFile(filename="""./README.md"""):
+def readFile(filename):
+	"""Helper Function to read files"""
 	theResult = None
-	try:
-		with open(str("""./{}""").format(str(filename))) as f:
-			theResult = f.read()
-	except Exception:
-		theResult = str(
-			"""See https://github.com/reactive-firewall/python-repo/{}"""
-		).format(filename)
+	if filename in ("""README.md""", """LICENSE.md"""):
+		try:
+			with open(str("""./{}""").format(str(filename))) as file:
+				theResult = file.read()
+		except Exception:
+			theResult = str(
+				"""See https://github.com/reactive-firewall/python-repo/{}"""
+			).format(filename)
 	return theResult
 
 
@@ -48,7 +50,7 @@ SLA = readFile("""LICENSE.md""")
 
 setup(
 	name="""pythonrepo""",
-	version="""1.1.2""",
+	version="""1.1.4""",
 	description="""Python Repo""",
 	long_description=readme,
 	install_requires=requirements,

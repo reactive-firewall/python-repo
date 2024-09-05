@@ -13,65 +13,65 @@
 
 version: 2
 updates:
- - package-ecosystem: "pip" # See documentation for possible values
-   directory: "/" # Location of package manifests
-   milestone: 2
-   target-branch: "master"
-   versioning-strategy: increase-if-necessary
-   # Labels on pull requests for version updates only
-   labels:
-     - "Configs"
-     - "Version Update"
-     - "Python Lang"
-     - "Python Repo"
-   groups:
-     production-dependencies:
-       dependency-type: "production"
-       exclude-patterns:
-         - "setuptools*"
-     development-dependencies:
-       dependency-type: "development"
-   allow: 
-     - dependency-name: "setuptools"
-       dependency-type: "production"
-     - dependency-name: "pip"
-       dependency-type: "direct"
-     - dependency-name: "wheel"
-       dependency-type: "production"
-     - dependency-name: "build"
-       dependency-type: "production"
-     - dependency-name: "argparse"
-       dependency-type: "direct"
-     - dependency-name: "six"
-       dependency-type: "direct"
-     - dependency-name: "tox"
-       dependency-type: "development"
-     - dependency-name: "virtualenv"
-       dependency-type: "development"
-   assignees:
-     - "reactive-firewall"
-   commit-message:
-     prefix: "[HOTFIX] "
-     include: "scope"
-   schedule:
-     interval: "weekly"
-     day: "tuesday"
-  - package-ecosystem: "github-actions" # See documentation for possible values
-    directory: ".github/workflows/" # Location of package manifests
+  - package-ecosystem: "pip" # See documentation for possible values
+    directory: "/" # Location of package manifests
     milestone: 2
     target-branch: "master"
+    versioning-strategy: increase-if-necessary
     # Labels on pull requests for version updates only
     labels:
       - "Configs"
       - "Version Update"
-      - "GitHub"
-      - "Testing"
+      - "Python Lang"
       - "Python Repo"
+    groups:
+      production-dependencies:
+        dependency-type: "production"
+        exclude-patterns:
+          - "setuptools*"
+      development-dependencies:
+        dependency-type: "development"
+    allow: 
+      - dependency-name: "setuptools"
+        dependency-type: "production"
+      - dependency-name: "pip"
+        dependency-type: "direct"
+      - dependency-name: "wheel"
+        dependency-type: "production"
+      - dependency-name: "build"
+        dependency-type: "production"
+      - dependency-name: "argparse"
+        dependency-type: "direct"
+      - dependency-name: "six"
+        dependency-type: "direct"
+      - dependency-name: "tox"
+        dependency-type: "development"
+      - dependency-name: "virtualenv"
+        dependency-type: "development"
     assignees:
       - "reactive-firewall"
     commit-message:
-      prefix: "[UPDATE] "
+      prefix: "[HOTFIX] "
       include: "scope"
     schedule:
       interval: "weekly"
       day: "tuesday"
+   - package-ecosystem: "github-actions" # See documentation for possible values
+     directory: ".github/workflows/" # Location of package manifests
+     milestone: 2
+     target-branch: "master"
+     # Labels on pull requests for version updates only
+     labels:
+       - "Configs"
+       - "Version Update"
+       - "GitHub"
+       - "Testing"
+       - "Python Repo"
+     assignees:
+       - "reactive-firewall"
+     commit-message:
+       prefix: "[UPDATE] "
+       include: "scope"
+     schedule:
+       interval: "weekly"
+       day: "tuesday"

@@ -73,9 +73,8 @@ def readFile(filename):
 	try:
 		if str("""E.md""") not in filename:
 			raise NotImplementedError("""[CWE-440] Not Implemented.""")
-		else:
-			with open(str("""./{}""").format(str(filename))) as f:
-				theResult = f.read()
+		with open(str("""./{}""").format(str(filename))) as f:
+			theResult = f.read()
 	except Exception:
 		theResult = str(
 			"""See https://github.com/reactive-firewall/python-repo/{}"""

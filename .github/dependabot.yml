@@ -3,18 +3,22 @@
 # Please see the documentation for all configuration options:
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
-# This Dependabot configuration file is set up to manage dependency updates for both Python packages (pip) and GitHub Actions workflows.
-# 
+# This Dependabot configuration file is set up to manage dependency updates
+#  for both Python packages (pip) and GitHub Actions workflows.
+#
 # Key points:
 # - Dependencies are categorized into production and development groups.
-# - The "setuptools" package is treated as an exception: it is excluded from the production group but is still allowed to be updated as a production dependency.
-# - The configuration includes specific labels, assignees, and commit message formats to streamline the update process.
+# - The "setuptools" package is treated as an exception: it is excluded from
+#    the production group but is still allowed to be updated as a production
+#    dependency.
+# - The configuration includes specific labels, assignees, and commit message
+#    formats to streamline the update process.
 # - Updates are scheduled to run weekly on Tuesdays.
-
+---
 version: 2
 updates:
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "pip"  # See documentation for possible values
+    directory: "/"  # Location of package manifests
     milestone: 2
     target-branch: "master"
     versioning-strategy: increase-if-necessary
@@ -31,7 +35,7 @@ updates:
           - "setuptools*"
       development-dependencies:
         dependency-type: "development"
-    allow: 
+    allow:
       - dependency-name: "setuptools"
         dependency-type: "production"
       - dependency-name: "pip"
@@ -56,22 +60,22 @@ updates:
     schedule:
       interval: "weekly"
       day: "tuesday"
-   - package-ecosystem: "github-actions" # See documentation for possible values
-     directory: ".github/workflows/" # Location of package manifests
-     milestone: 2
-     target-branch: "master"
-     # Labels on pull requests for version updates only
-     labels:
-       - "Configs"
-       - "Version Update"
-       - "GitHub"
-       - "Testing"
-       - "Python Repo"
-     assignees:
-       - "reactive-firewall"
-     commit-message:
-       prefix: "[UPDATE] "
-       include: "scope"
-     schedule:
-       interval: "weekly"
-       day: "tuesday"
+  - package-ecosystem: "github-actions"  # See documentation for possible values
+    directory: ".github/workflows/"  # Location of package manifests
+    milestone: 2
+    target-branch: "master"
+    # Labels on pull requests for version updates only
+    labels:
+      - "Configs"
+      - "Version Update"
+      - "GitHub"
+      - "Testing"
+      - "Python Repo"
+    assignees:
+      - "reactive-firewall"
+    commit-message:
+      prefix: "[UPDATE] "
+      include: "scope"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"

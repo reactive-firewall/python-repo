@@ -3,7 +3,7 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2020, Kendrick Walls
+# Copyright (c) 2017-2024, Kendrick Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,26 +17,67 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Sets up the package.
+
+Minimal Acceptance Testing:
+
+	Testcase 0: Just setup test fixtures by importing pythonrepo.
+
+		>>> import pythonrepo
+		>>>
+		>>> pythonrepo.__package__ is not None
+		True
+		>>>
+
+"""
 
 try:
+	import os
+	import warnings
+	warnings.simplefilter("default")  # Change the filter in this process
+	os.environ["PYTHONWARNINGS"] = "default"  # Also affect subprocesses
 	from setuptools import setup
 	from setuptools import find_packages
+	with warnings.catch_warnings():
+		warnings.simplefilter("ignore")
+		try:
+			from setuptools.config import read_configuration
+		except Exception:
+			from setuptools.config.setupcfg import read_configuration
 except Exception:
-	raise ImportError("""Not Implemented.""")
+	raise NotImplementedError("""[CWE-440] Not Implemented.""")
 
 
 def readFile(filename):
-	"""Helper Function to read files"""
+	"""Will attempt to read the file at with the given filename or path.
+
+	Used as a helper function to read files and return strings with the content.
+
+		Testing:
+
+		First setup test fixtures by importing pythonrepo.
+
+			>>> import pythonrepo
+			>>>
+
+		Testcase 0: Should have Function readFile() WHEN loading setup.py.
+
+			>>> pythonrepo.readFile is not None
+			True
+			>>> type(pythonrepo.readFile) is type(1)
+			False
+			>>>
+
+	"""
 	theResult = None
-	if filename in ("""README.md""", """LICENSE.md"""):
-		try:
-			with open(str("""./{}""").format(str(filename))) as file:
-				theResult = file.read()
-		except Exception:
-			theResult = str(
-				"""See https://github.com/reactive-firewall/python-repo/{}"""
-			).format(filename)
-	return theResult
+	try:
+		with open(str("""./{}""").format(str(filename))) as f:
+			theResult = f.read()
+	except Exception:
+		theResult = str(
+			"""See https://github.com/reactive-firewall/python-repo/{}"""
+		).format(filename)
+	return str(theResult)
 
 
 try:
@@ -45,18 +86,62 @@ try:
 except Exception:
 	requirements = None
 
+
+conf_dict = None
+
+
+with warnings.catch_warnings():
+	warnings.simplefilter("ignore")
+	conf_dict = read_configuration("""setup.cfg""", ignore_option_errors=True)
+
+
 readme = readFile("""README.md""")
+"""The multi-line description and/or summary of this program."""
+
 SLA = readFile("""LICENSE.md""")
+"""The "Software License Agreement" of this program."""
+
+try:
+	class_tags = [
+		str("""Development Status :: 4 - Beta"""),
+		str("""Environment :: Console"""),
+		str("""Intended Audience :: Developers"""),
+		str("""Operating System :: MacOS :: MacOS X"""),
+		str("""Operating System :: POSIX :: Linux"""),
+		str("""License :: OSI Approved :: MIT License"""),
+		str("""Programming Language :: Python :: 3"""),
+		str("""Programming Language :: Python :: 3 :: Only"""),
+		str("""Programming Language :: Python :: 3.14"""),
+		str("""Programming Language :: Python :: 3.13"""),
+		str("""Programming Language :: Python :: 3.12"""),
+		str("""Programming Language :: Python :: 3.11"""),
+		str("""Programming Language :: Python :: 3.10"""),
+		str("""Programming Language :: Python :: 3.9"""),
+		str("""Programming Language :: Python :: 3.8"""),
+		str("""Programming Language :: Python :: 3.7"""),
+		str("""Programming Language :: Python :: 3.6"""),
+		str("""Programming Language :: Python :: 3.5"""),
+		str("""Programming Language :: Python :: 3.4"""),
+		str("""Programming Language :: Python :: 2.7"""),
+		str("""Topic :: Software Development :: Libraries :: Python Modules""")
+	]
+except Exception:
+	class_tags = str("""Development Status :: 4 - Beta""")
 
 setup(
-	name="""pythonrepo""",
-	version="""1.1.4""",
-	description="""Python Repo""",
+	name=conf_dict["""metadata"""]["""name"""],
+	version=conf_dict["""metadata"""]["""version"""],
+	description=conf_dict["""metadata"""]["""description"""],
 	long_description=readme,
+	long_description_content_type="""text/markdown""",
+	zip_safe=True,
+	include_package_data=True,
 	install_requires=requirements,
-	author="""reactive-firewall""",
-	author_email="""reactive-firewall@users.noreply.github.com""",
-	url="""https://github.com/reactive-firewall/python-repo.git""",
+	author=conf_dict["""metadata"""]["""author"""],
+	author_email=conf_dict["""metadata"""]["""author_email"""],
+	classifiers=class_tags,
+	url=conf_dict["""metadata"""]["""url"""],
+	download_url=conf_dict["""metadata"""]["""download_url"""],
 	license=SLA,
 	packages=find_packages(exclude=("""tests""", """docs""")),
 )

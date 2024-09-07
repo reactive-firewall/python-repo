@@ -93,8 +93,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Setup dependencies
       run: |
-        python -m pip install --upgrade pip setuptools wheel
+        python -m pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37"
         pip install -r ./requirements.txt
+        pip install --user -r ./test-requirements.txt || true
     - name: Pre-build
       id: bootstrap
       run: |
@@ -151,8 +152,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for ${{ matrix.python-version }}
       run: |
-        pip install -r ./requirements.txt ;
-        pip install coverage || true ;
+        pip install -r ./requirements.txt
+        pip install --user -r ./test-requirements.txt || true
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -198,11 +199,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade --upgrade-strategy eager pip setuptools wheel ;
-        pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
-        pip install --upgrade --upgrade-strategy eager pytest ;
-        pip install --upgrade --upgrade-strategy eager pytest-cov ;
-        pip install --upgrade --upgrade-strategy eager coverage ;
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37"
+        pip install -r ./requirements.txt
+        pip install --user -r ./test-requirements.txt || true
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -282,11 +281,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade --upgrade-strategy eager pip setuptools wheel ;
-        pip install --upgrade --upgrade-strategy eager -r ./requirements.txt ;
-        pip install --upgrade --upgrade-strategy eager pytest ;
-        pip install --upgrade --upgrade-strategy eager pytest-cov ;
-        pip install --upgrade --upgrade-strategy eager coverage ;
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" ;
+        pip install -r ./requirements.txt ;
+        pip install --user -r ./test-requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -357,11 +354,9 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies for python Linters
       run: |
-        pip install --upgrade pip setuptools wheel
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" ;
         pip install -r ./requirements.txt ;
-        pip install flake8 ;
-        pip install pyflakes ;
-        pip install pep8 ;
+        pip install --user -r ./test-requirements.txt || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -403,11 +398,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       run: |
-        pip install --upgrade pip setuptools wheel
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" ;
         pip install -r ./requirements.txt ;
-        pip install coverage ;
-        pip install pytest ;
-        pip install pytest-cov ;
+        pip install --user -r ./test-requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
       run: |
@@ -477,15 +470,9 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies for Tox
       run: |
-        pip install --upgrade pip setuptools wheel tox
+        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "tox>=3.0";
         pip install -r ./requirements.txt ;
-        pip install coverage ;
-        pip install codecov ;
-        pip install flake8 ;
-        pip install pyflakes ;
-        pip install pep8 ;
-        pip install tox ;
-        pip install six ;
+        pip install --user -r ./test-requirements.txt || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;

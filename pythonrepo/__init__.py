@@ -23,8 +23,8 @@ __module__ = """pythonrepo"""
 """This is pythonrepo module Template."""
 
 
-__version__ = """1.1.4"""
-"""This is version 1.1.4 of pythonrepo Template"""
+__version__ = """1.1.5"""
+"""This is version 1.1.5 of pythonrepo Template"""
 
 
 try:

@@ -3,13 +3,14 @@ This repo is basically my template for new repos/projects
 
 # CI Template:
 
-By default this template will assume that the Travis CI Service and Circle-CI Service are used for CI/CD
+By default this template will assume that the GHA Service and Circle-CI Service are used for CI/CD
 
 # Status
 
 ### master:
-[![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=master)](https://travis-ci.org/reactive-firewall/python-repo)
+[![CI](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml/badge.svg?branch=master)](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/master)
+[![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=master)](https://travis-ci.org/reactive-firewall/python-repo)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/6gggp1wpbnnjokm4/branch/master?svg=true)](https://ci.appveyor.com/project/reactive-firewall/python-repo/branch/master)
 [![Python 3](https://pyup.io/repos/github/reactive-firewall/python-repo/python-3-shield.svg)](https://pyup.io/repos/github/reactive-firewall/PiAP-python-tools/)
 [![Updates](https://pyup.io/repos/github/reactive-firewall/python-repo/shield.svg)](https://pyup.io/repos/github/reactive-firewall/python-repo/)
@@ -24,8 +25,9 @@ By default this template will assume that the Travis CI Service and Circle-CI Se
 ![commits-since](https://img.shields.io/github/commits-since/reactive-firewall/python-repo/stable.svg?maxAge=9000)
 
 ### Stable:
-[![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=stable)](https://travis-ci.org/reactive-firewall/python-repo)
+[![CI](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml/badge.svg?branch=stable&event=pull_request)](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/stable)
+[![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=stable)](https://travis-ci.org/reactive-firewall/python-repo)
 [![Appveyor](https://ci.appveyor.com/api/projects/status/6gggp1wpbnnjokm4/branch/stable?svg=true)](https://ci.appveyor.com/project/reactive-firewall/python-repo/branch/stable)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/)
 [![code coverage](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/graph/badge.svg)](https://codecov.io/gh/reactive-firewall/python-repo/branch/stable/)
@@ -71,7 +73,7 @@ make clean ; # cleans up for next test
 # Next steps:
 
 Like automation? Then integrate away, this template can take it!
-(hint: @travis-ci, @houndci-bot, @pyup-bot, @stickler-ci, @circleci, @codecov-io, @lemurheavy, @coverallsapp, @codeclimate)
+(hint: @coderabbitai, @travis-ci, @houndci-bot, @pyup-bot, @circleci, @codecov-io, @lemurheavy, @coverallsapp, @codeclimate)
 
 Not in a rush? Then be sure to edit the badges in the README.
 (hint: `sed -e 's/python-repo/MY-NEW-REPO' ./README.md`)

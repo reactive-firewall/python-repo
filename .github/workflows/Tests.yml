@@ -203,12 +203,9 @@ jobs:
         pip install -r ./requirements.txt
         pip install --user -r ./test-requirements.txt || true
     - name: Install code-climate tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
+      if: ${{ runner.os }} != "Linux"
       shell: bash
-      run: |
-        if [ $OS == ubuntu-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
-        if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
-        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
+      run: if [ $OS == macos-latest ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
     - name: Install deepsource tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -240,10 +237,10 @@ jobs:
         path: ./test-reports/
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
+      if: ${{ runner.os }} != "Linux"
       shell: bash
       run: |
-        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+        if [ $OS == macos-latest ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
     - name: deepsource for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -287,10 +284,7 @@ jobs:
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
-      run: |
-        if [ $OS == ubuntu-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter || true ; fi ;
-        if [ $OS == ubuntu-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
-        if [ $OS == ubuntu-latest ] ; then ./cc-test-reporter before-build || true ; fi
+      run: if [ $OS == ubuntu-latest ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
     - name: Install deepsource tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash
@@ -403,10 +397,7 @@ jobs:
         pip install --user -r ./test-requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ runner.os }} != "Linux"
-      run: |
-        if [ $OS == macos-latest ] ; then curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-darwin-amd64 > ./cc-test-reporter || true ; fi ;
-        if [ $OS == macos-latest ] ; then chmod +x ./cc-test-reporter 2>/dev/null || true ; fi
-        if [ $OS == macos-latest ] ; then ./cc-test-reporter before-build || true ; fi
+      run: if [ $OS == macos-latest ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
       shell: bash
     - name: Pre-Clean
       id: clean-prep

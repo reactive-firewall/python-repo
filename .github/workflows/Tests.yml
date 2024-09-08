@@ -237,7 +237,7 @@ jobs:
         path: ./test-reports/
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }}
-      if: $runner.os != "Linux"
+      if: ${{ runner.os }} != "Linux"
       shell: bash
       run: |
         if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;

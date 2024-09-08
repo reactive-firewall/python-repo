@@ -29,14 +29,9 @@ jobs:
           when: on_success
       - run:
           shell: /bin/bash
-          name: "install coverage attempt"
+          name: "install test extras attempt"
           command: |
-            python3 -m pip install --user coverage || true
-      - run:
-          name: "install flake8 attempt"
-          command: |
-            python3 -m pip install --user flake8 || true
-          when: on_success
+            python3 -m pip install --user -r ./test-requirements.txt || true
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
           paths:
@@ -61,12 +56,6 @@ jobs:
     steps:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
-      - run:
-          shell: /bin/bash
-          name: "clean up for test"
-          command: |
-            python3 -m pip install --user coverage || true
-          when: on_success
       - run:
           shell: /bin/bash
           name: "clean up for test"
@@ -113,15 +102,9 @@ jobs:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
           shell: /bin/bash
-          name: "clean up for test"
-          command: |
-            python3 -m pip install --user coverage || true
-          when: on_success
-      - run:
-          shell: /bin/bash
           name: "setup up for pytest"
           command: |
-            python3 -m pip install --user pytest || true
+            python3 -m pip install --upgrade --user -r ./test-requirements.txt || true
           when: on_success
       - run:
           shell: /bin/bash
@@ -168,9 +151,9 @@ jobs:
       - restore_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
       - run:
-          name: "install flake8 attempt"
+          name: "install linters extras attempt"
           command: |
-            python3 -m pip install --user flake8 || true
+            python3 -m pip install --upgrade --user -r ./test-requirements.txt || true
       - run:
           shell: /bin/bash
           name: "clean up for test"

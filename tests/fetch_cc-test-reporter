@@ -69,27 +69,28 @@ umask 127
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
 EXIT_CODE=0
 
-test -x $(command -v grep) || exit 126 ;
-test -x $(command -v curl) || exit 126 ;
+test -x "$(command -v grep)" || exit 126 ;
+test -x "$(command -v curl)" || exit 126 ;
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 test -x "$(command -v shlock)" || exit 126 ;
-test -x $(command -v gpgv) || exit 126 ;
-test -x $(command -v shasum) || exit 126 ;
+test -x "$(command -v gpgv)" || exit 126 ;
+test -x "$(command -v shasum)" || exit 126 ;
 
 # sorry no windows support here
-if [[ $( \uname -s ) == "*arwin" ]] ; then
+if [[ $( command uname -s ) == *arwin ]] ; then
 	CI_OS="darwin"
 else
 	CI_OS="linux"
 fi
 
 function cleanup() {
-	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
+	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
 	rm -f ./test-reporter-latest-*-amd64.SHA*.sig 2>/dev/null || true ; wait ;
+	rm -f ./test-reporter-latest-*-amd64.SHA* 2>/dev/null > /dev/null || true ; wait ;
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
-if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
@@ -100,7 +101,8 @@ if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		echo "CodeCov already in progress by "`head ${LOCK_FILE}` ;
+		# shellcheck disable=SC2046
+		printf "\t%s\n" "CodeClimate already in progress by "$(head "${LOCK_FILE}") >&2 ;
 		false ;
 		exit 126 ;
 fi
@@ -114,13 +116,14 @@ if [[ -d ./.git ]] ; then
 elif [[ -d ./tests ]] ; then
 	_TEST_ROOT_DIR="./" ;
 else
-	echo "FAIL: missing valid folder or file"
+	printf "%s\n" "FAIL: missing valid folder or file"
 	EXIT_CODE=1
 fi
 
 # This File  MUST BE GIT-IGNORED
 # to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
+	# shellcheck disable=SC2086,SC1091
 	source ./codecov_env 2>/dev/null || true ;
 fi
 
@@ -130,20 +133,23 @@ fi
 #########################
 curl -fLso ./test-reporter-latest-${CI_OS:-linux}-amd64 https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64 ;
 for i in 1 256 512 ; do
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i}" ; wait ;
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i}.sig" ; wait ;
+	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}" ; wait ;
+	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig" ; wait ;
 	# test sha1/sha512 signatures if found and sha256 even if not found
-	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
-		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i}.sig ) ]] ; then
-			# configure your CI evironment to trust the key at ????
-			# FP: KEY FP
+	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+		if [[ ${i} -eq 1 ]]; then
+			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
+		fi
+		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig ) ]] ; then
+			# configure your CI evironment to trust the key at gpg --keyserver  keys.openpgp.org --recv-keys 9BD9E2DD46DA965A537E5B0A5CBF320243B6FD85
+			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
 			# Set CI=true to continue on missing keys
-			gpgv test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i}.sig test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i} || ${CI} || EXIT_CODE=126
-			rm -vf codecov.SHA${i}SUM.sig 2>/dev/null ;
+			gpg --verify test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || ${CI} || EXIT_CODE=126
+			rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig 2>/dev/null ;
 		fi
-		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i} || EXIT_CODE=126
-		rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.SHA${i} 2>/dev/null ;
+		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || EXIT_CODE=126
+		rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} 2>/dev/null ;
 	fi
 done
 
@@ -153,14 +159,13 @@ if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 fi
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./cc-test-reporter || EXIT_CODE=10 ;
+	./cc-test-reporter before-build || EXIT_CODE=10 ;
 fi
 
 
 unset _TEST_ROOT_DIR 2>/dev/null || true ;
 
-rm -f ./test-reporter-latest-*-amd64.SHA* 2>/dev/null > /dev/null || true ; wait ;
-rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
+cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ;
 
 # goodbye
 exit ${EXIT_CODE:-255} ;

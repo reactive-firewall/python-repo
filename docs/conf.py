@@ -18,35 +18,48 @@ import argparse
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../pythonrepo'))
+sys.path.insert(0, os.path.abspath('../'))
+sys.path.insert(1, os.path.abspath('./pythonrepo'))
 
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '4.0'
+needs_sphinx = '5.3'
 
 # Add any Sphinx extension module names here, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
+# for md us 'autodoc2' (pip install sphinx-autodoc2)
+# for rst use 'sphinx.ext.autodoc'
 extensions = [
-				'sphinx.ext.autodoc', 'sphinx.ext.autosummary', 'sphinx.ext.githubpages',
+				'sphinx.ext.napoleon', 'autodoc2', 'sphinx.ext.autosummary',
+				'sphinx.ext.githubpages',
 				'sphinx.ext.autosummary', 'sphinx.ext.doctest', 'sphinx.ext.todo',
-				'sphinx.ext.linkcode', 'sphinx.ext.viewcode'
+				'sphinx.ext.linkcode', 'sphinx.ext.viewcode', 'myst_parser'
 			]
+
+# for md auto-docs
+autodoc2_packages = [
+	"pythonrepo",
+	"tests",
+]
+
+autodoc2_render_plugin = "myst"
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
 
 # The suffix of source filenames.
 source_suffix = {
-	'.rst': 'restructuredtext',
 	'.md': 'markdown',
+	'.txt': 'markdown',
+	'.rst': 'restructuredtext',
 }
 
 # The encoding of source files. Official sphinx docs reccomend utf-8-sig.
 source_encoding = 'utf-8-sig'
 
 # The master toctree document.
-master_doc = 'index'
+master_doc = 'toc'
 
 # General information about the project.
 project = u'python_template'
@@ -74,7 +87,7 @@ today_fmt = '%Y.%B.%d'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '.github/', '.circleci/', 'dist', 'tests']
+exclude_patterns = ['_build', '.github', '.circleci', '.DS_Store', '**/.git', 'dist', 'tests']
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -86,22 +99,28 @@ add_function_parentheses = True
 # unit titles (such as .. function::).
 add_module_names = True
 
+# sigs should not have backslashes
+strip_signature_backslash = True
+
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.
-show_authors = False
+show_authors = True
 
 # The name of the Pygments (syntax highlighting) style to use.
+# pygments_style = 'py'
 pygments_style = 'default'
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
 
+# Create table of contents entries for domain objects (e.g. functions, classes, attributes, etc.).
+toc_object_entries = True
 
 # -- Options for HTML output ---------------------------------------------------
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+html_theme = 'sphinxawesome_theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -116,7 +135,7 @@ html_theme = 'default'
 # html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-# html_short_title = None
+html_short_title = 'Project Docs'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -126,6 +145,8 @@ html_theme = 'default'
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
 # html_favicon = None
+
+html_permalinks_icon = '<span>#</span>'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -176,6 +197,29 @@ html_static_path = ['_static']
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'python_repo_doc'
 
+
+# -- Options for MyST markdown parser -------------------------------------------
+# see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#syntax-directives
+
+# be more like GFM with style
+myst_enable_extensions = set(['tasklist', 'strikethrough', 'fieldlist'])
+
+# for GFM diagrams and interoperability with other Markdown renderers
+myst_fence_as_directive = set(('mermaid', 'suggestion', 'note'))
+
+# Focus only on github markdown
+myst_gfm_only = False
+
+
+#heading_anchors = 1
+
+# -- Options for napoleon ext --------------------------------------------------
+
+# include __init__ when it has docstrings
+napoleon_include_init_with_doc = True
+
+# try to be smarter
+napoleon_preprocess_types = True
 
 # -- Options for LaTeX output --------------------------------------------------
 
@@ -266,3 +310,12 @@ texinfo_documents = [
 
 # How to display URL addresses: 'footnote', 'no', or 'inline'.
 # texinfo_show_urls = 'footnote'
+
+# -- Link resolver -------------------------------------------------------------
+def linkcode_resolve(domain, info):
+	if domain != 'py':
+		return None
+	if not info['module']:
+		return None
+	filename = info['module'].replace('.', '/')
+	return "https://github.com/reactive-firewall/python-repo/blob/stable/%s.py" % filename

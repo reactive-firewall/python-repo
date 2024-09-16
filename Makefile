@@ -136,7 +136,7 @@ cleanup:
 
 clean: cleanup
 	$(QUIET)rm -f test-results/junit.xml 2>/dev/null || true
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:

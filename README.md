@@ -70,6 +70,10 @@ make test-tox ; # runs the tox tests
 make clean ; # cleans up for next test
 ```
 
+# Documentation
+
+For more details read the project [documentation](./docs/index).
+
 # Next steps:
 
 Like automation? Then integrate away, this template can take it!

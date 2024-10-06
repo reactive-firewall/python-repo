@@ -1,6 +1,6 @@
 # Welcome to Python Repo' documentation!
 
-## Contents:
+## Contents
 
 ```{toctree}
 :maxdepth: 3
@@ -18,6 +18,6 @@ apidocs/index
 ```
 
 
-## Quickstart:
+## Quickstart
 
 more filler text

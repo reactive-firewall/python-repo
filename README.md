@@ -1,13 +1,15 @@
-# About
+# Python Repo Template
+
+## About
 This repo is basically my template for new repos/projects
 
-# CI Template:
+## CI Template
 
 By default this template will assume that the GHA Service and Circle-CI Service are used for CI/CD
 
-# Status
+## Status
 
-### master:
+### master
 [![CI](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml/badge.svg?branch=master)](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/master.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/master)
 [![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=master)](https://travis-ci.org/reactive-firewall/python-repo)
@@ -24,7 +26,7 @@ By default this template will assume that the GHA Service and Circle-CI Service 
 ![Size](https://img.shields.io/github/languages/code-size/reactive-firewall/python-repo.svg)
 ![commits-since](https://img.shields.io/github/commits-since/reactive-firewall/python-repo/stable.svg?maxAge=9000)
 
-### Stable:
+### Stable
 [![CI](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml/badge.svg?branch=stable&event=pull_request)](https://github.com/reactive-firewall/python-repo/actions/workflows/Tests.yml)
 [![CircleCI](https://circleci.com/gh/reactive-firewall/python-repo/tree/stable.svg?style=svg)](https://circleci.com/gh/reactive-firewall/python-repo/tree/stable)
 [![status](https://travis-ci.org/reactive-firewall/python-repo.svg?branch=stable)](https://travis-ci.org/reactive-firewall/python-repo)
@@ -34,7 +36,7 @@ By default this template will assume that the GHA Service and Circle-CI Service 
 [![Coverage Status](https://coveralls.io/repos/github/reactive-firewall/python-repo/badge.svg?branch=stable)](https://coveralls.io/github/reactive-firewall/python-repo?branch=stable)
 [![codebeat badge](https://codebeat.co/badges/87520e4a-6d24-4e98-a61e-6e9efc58f783)](https://codebeat.co/projects/github-com-reactive-firewall-python-repo-stable)
 
-# How do I use this to create a new project repo?
+### How do I use this to create a new project repo?
 
 (assuming new project is already forked on github to `MY-NEW-REPO`)
 
@@ -44,7 +46,7 @@ git clone https://github.com/reactive-firewall/MY-NEW-REPO.git MY-NEW-REPO
 # cd ./MY-NEW-REPO
 ```
 
-# Dev Testing Template:
+### Dev Testing Template
 
 In a rush? Then use this:
 
@@ -70,11 +72,11 @@ make test-tox ; # runs the tox tests
 make clean ; # cleans up for next test
 ```
 
-# Documentation
+### Documentation
 
 For more details read the project [documentation](./docs/index).
 
-# Next steps:
+### Next steps
 
 Like automation? Then integrate away, this template can take it!
 (hint: @coderabbitai, @travis-ci, @houndci-bot, @pyup-bot, @circleci, @codecov-io, @lemurheavy, @coverallsapp, @codeclimate)

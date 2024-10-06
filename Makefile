@@ -59,7 +59,7 @@ PHONY: must_be_root cleanup
 
 build:
 	$(QUIET)$(ECHO) "No need to build. Try make -f Makefile install"
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile text 2>/dev/null || true
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile html 2>/dev/null || true
 
 init:
 	$(QUIET)$(ECHO) "$@: Done."
@@ -136,7 +136,7 @@ cleanup:
 
 clean: cleanup
 	$(QUIET)rm -f test-results/junit.xml 2>/dev/null || true
-	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean 2>/dev/null || true
+	$(QUIET)$(MAKE) -s -C ./docs/ -f Makefile clean || true
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_be_root:

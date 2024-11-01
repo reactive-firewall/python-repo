@@ -65,9 +65,9 @@ def NoOp(*args, **kwargs):
 # More boiler-plate-code
 
 
-TASK_OPTIONS = dict({  # skipcq: PTC-W0020
+TASK_OPTIONS = {  # skipcq: PTC-W0020
 	'noop': NoOp
-})
+}
 """The callable function tasks of this program."""
 
 

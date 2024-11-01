@@ -1,4 +1,4 @@
-#python
+#python testing requirements
 # time - builtin - PSF licence
 # re - builtin - PSF licence?
 # subprocess - PSF licence
@@ -16,9 +16,9 @@ six>=1.0.0
 tox>=3.0.0
 #py>=1.4.33
 # pip>=19.0
-###
+#
 # TESTING ONLY - Do NOT report issues with these optionals on python-repo
-###
+#
 flake8>=5.0
 pyflakes>=2.5.0
 pep8>=1.0

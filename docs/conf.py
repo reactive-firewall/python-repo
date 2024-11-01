@@ -32,9 +32,9 @@ needs_sphinx = '5.3'
 # for rst use 'sphinx.ext.autodoc'
 extensions = [
 				'sphinx.ext.napoleon', 'autodoc2', 'sphinx.ext.autosummary',
-				'sphinx.ext.githubpages',
-				'sphinx.ext.autosummary', 'sphinx.ext.doctest', 'sphinx.ext.todo',
-				'sphinx.ext.linkcode', 'sphinx.ext.viewcode', 'myst_parser'
+				'sphinx.ext.githubpages', 'myst_parser',
+				'sphinx.ext.doctest', 'sphinx.ext.todo',
+				'sphinx.ext.linkcode', 'sphinx.ext.viewcode'
 			]
 
 # for md auto-docs
@@ -202,10 +202,10 @@ htmlhelp_basename = 'python_repo_doc'
 # see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#syntax-directives
 
 # be more like GFM with style
-myst_enable_extensions = set(['tasklist', 'strikethrough', 'fieldlist'])
+myst_enable_extensions = ('tasklist', 'strikethrough', 'fieldlist')
 
 # for GFM diagrams and interoperability with other Markdown renderers
-myst_fence_as_directive = set(('mermaid', 'suggestion', 'note'))
+myst_fence_as_directive = ('mermaid', 'suggestion', 'note')
 
 # Focus only on github markdown
 myst_gfm_only = False
@@ -313,9 +313,7 @@ texinfo_documents = [
 
 # -- Link resolver -------------------------------------------------------------
 def linkcode_resolve(domain, info):
-	if domain != 'py':
-		return None
-	if not info['module']:
+	if domain != 'py' or not info.get('module'):
 		return None
 	filename = info['module'].replace('.', '/')
 	return "https://github.com/reactive-firewall/python-repo/blob/stable/%s.py" % filename

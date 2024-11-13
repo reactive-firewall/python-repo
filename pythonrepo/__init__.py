@@ -22,18 +22,14 @@
 __module__ = """pythonrepo"""
 """This is pythonrepo module Template."""
 
-
 __version__ = """1.1.5"""
 """This is version 1.1.5 of pythonrepo Template"""
-
 
 try:
 	import sys
 	import os
 	if str(__module__) in __file__:
-		__parentPath = os.path.join(
-			os.path.dirname(__file__), '..'
-		)
+		__parentPath = os.path.join(os.path.dirname(__file__), '..')
 		sys.path.insert(0, os.path.abspath(__parentPath))
 except Exception as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))

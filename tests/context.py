@@ -16,10 +16,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """tests.context"""
 """This is pythonrepo testing module Template."""
-
 
 try:
 	import sys
@@ -32,7 +30,6 @@ except Exception as badErr:
 	baton.path = __file__
 	baton.__cause__ = badErr
 	raise baton
-
 
 try:
 	import pythonrepo as pythonrepo  # skipcq: PYL-C0414

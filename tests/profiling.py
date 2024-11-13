@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 # Third-party Acknowledgement:
 # ..........................................
 # Some code (namely: class timewith, @do_cprofile, @do_line_profile) was modified/derived from:
@@ -28,10 +27,8 @@
 # ..........................................
 # NO ASSOCIATION
 
-
 __module__ = """tests.profiling"""
 """This is pythonrepo testing module Template."""
-
 
 try:
 	import sys
@@ -43,7 +40,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.path = __file__
 	baton.__cause__ = badErr
 	raise baton
-
 
 try:
 	if 'os' not in sys.modules:
@@ -57,7 +53,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.__cause__ = badErr
 	raise baton
 
-
 try:
 	if 'functools' not in sys.modules:
 		import functools
@@ -70,7 +65,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.__cause__ = badErr
 	raise baton
 
-
 try:
 	import time
 	if time.__name__ is None:  # pragma: no branch
@@ -81,7 +75,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.path = __file__
 	baton.__cause__ = badErr
 	raise baton
-
 
 try:
 	if 'cProfile' not in sys.modules:
@@ -94,7 +87,6 @@ except Exception as badErr:  # pragma: no branch
 	baton.path = __file__
 	baton.__cause__ = badErr
 	raise baton
-
 
 try:
 	try:
@@ -112,7 +104,6 @@ except Exception as badErr:  # pragma: no branch
 
 class timewith():
 	"""Basic timer for do_time_profile."""
-
 	def __init__(self, name=''):
 		self.name = name
 		self.start = time.time()
@@ -221,6 +212,7 @@ def do_cprofile(func):
 			return result
 		finally:
 			profile.print_stats()
+
 	return profiled_func
 
 
@@ -242,10 +234,13 @@ try:  # noqa
 					return func(*args, **kwargs)
 				finally:
 					profiler.print_stats()
+
 			return profiled_func
+
 		return inner
 
 except ImportError:  # pragma: no cover
+
 	def do_profile(follow=None):
 		"""Helpful if you accidentally leave in production!"""
 		if follow is None:
@@ -254,7 +249,9 @@ except ImportError:  # pragma: no cover
 		def inner(func):
 			def nothing(*args, **kwargs):
 				return func(*args, **kwargs)
+
 			return nothing
+
 		return inner
 
 
@@ -269,4 +266,3 @@ if __name__ in '__main__':  # pragma: no cover
 		exitcode = main(sys.argv[1:])
 	finally:
 		sys.exit(exitcode)
-

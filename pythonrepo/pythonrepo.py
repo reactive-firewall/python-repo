@@ -17,10 +17,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 __module__ = """pythonrepo.pythonrepo"""
 """This is pythonrepo component Template."""
-
 
 try:
 	from . import sys
@@ -34,25 +32,16 @@ except Exception as err:
 	# Throw more relevant Error
 	raise baton
 
-
 from . import __version__
-
 
 __prog__ = str(__module__)
 """The name of this program is PythonRepo"""
 
-
-__description__ = str(
-	"""Add a Description Here"""
-)
+__description__ = str("""Add a Description Here""")
 """Contains the description of the program."""
 
-
-__epilog__ = str(
-	"""Add an epilog here."""
-)
+__epilog__ = str("""Add an epilog here.""")
 """Contains the short epilog of the program CLI help text."""
-
 
 # Add your functions here
 
@@ -64,10 +53,9 @@ def NoOp(*args, **kwargs):
 
 # More boiler-plate-code
 
-
-TASK_OPTIONS = dict({  # skipcq: PTC-W0020
+TASK_OPTIONS = {  # skipcq: PTC-W0020
 	'noop': NoOp
-})
+}
 """The callable function tasks of this program."""
 
 
@@ -78,20 +66,15 @@ def parseArgs(arguments=None):
 	returns argparse.Namespace - the Namespace parsed with
 		the key-value pairs.
 	"""
-	parser = argparse.ArgumentParser(
-		prog=__prog__,
-		description=__description__,
-		epilog=__epilog__
+	parser = argparse.ArgumentParser(prog=__prog__, description=__description__, epilog=__epilog__)
+	parser.add_argument(
+		'some_task', choices=TASK_OPTIONS.keys(), help='the help text for this option.'
 	)
 	parser.add_argument(
-		'some_task', choices=TASK_OPTIONS.keys(),
-		help='the help text for this option.'
-	)
-	parser.add_argument(
-		'-V', '--version',
-		action='version', version=str(
-			"%(prog)s {version}"
-		).format(version=str(__version__))
+		'-V',
+		'--version',
+		action='version',
+		version=str("%(prog)s {version}").format(version=str(__version__))
 	)
 	return parser.parse_known_args(arguments)
 

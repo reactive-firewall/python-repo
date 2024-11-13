@@ -17,7 +17,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-
 import unittest
 import subprocess
 import sys
@@ -163,7 +162,6 @@ def debugIfNoneResult(thepython, theArgs, theOutput):
 
 class BasicUsageTestSuite(unittest.TestCase):
 	"""Basic functional test cases."""
-
 	def test_absolute_truth_and_meaning(self):
 		"""Insanity Test. if ( is true ) usage."""
 		self.assertTrue(True)  # skipcq: PYL-W1503
@@ -192,11 +190,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					args = [
 						str(thepython),
 						str("-m"),
-						str("pythonrepo.{}").format(
-							str(
-								test_case
-							)
-						),
+						str("pythonrepo.{}").format(str(test_case)),
 						str("--version")
 					]
 					theOutputtext = checkPythonCommand(args, stderr=subprocess.STDOUT)
@@ -232,11 +226,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str(thepython),
 						str("-m"),
 						str("pythonrepo.pythonrepo"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
+						str("{}").format(str(test_case))
 					]
 					theOutputtext = timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
@@ -271,11 +261,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str(thepython),
 						str("-m"),
 						str("pythonrepo.pythonrepo"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
+						str("{}").format(str(test_case))
 					]
 					theOutputtext = timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
@@ -310,11 +296,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 						str(thepython),
 						str("-m"),
 						str("pythonrepo.pythonrepo"),
-						str("{}").format(
-							str(
-								test_case
-							)
-						)
+						str("{}").format(str(test_case))
 					]
 					theOutputtext = timePythonCommand(args, stderr=subprocess.STDOUT)
 					# now test it
@@ -340,4 +322,3 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 if __name__ == '__main__':
 	unittest.main()
-

@@ -21,7 +21,6 @@
 __module__ = """tests"""
 """This is pythonrepo testing module Template."""
 
-
 try:
 	try:
 		import sys

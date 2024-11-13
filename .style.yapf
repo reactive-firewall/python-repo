@@ -61,7 +61,7 @@ blank_line_before_module_docstring=True
 #                      # <------ this blank line
 #     def method():
 #       pass
-blank_line_before_nested_class_or_def=True
+blank_line_before_nested_class_or_def=False
 
 # Do not split consecutive brackets. Only relevant when
 # dedent_closing_brackets is set. For example:
@@ -93,7 +93,7 @@ column_limit=99
 # - VALIGN-RIGHT: Vertically align continuation lines to multiple of
 #   INDENT_WIDTH columns. Slightly right (one tab or a few spaces) if
 #   cannot vertically align continuation lines with indent characters.
-continuation_align_style=FIXED
+continuation_align_style=VALIGN-RIGHT
 
 # Indent width used for line continuations.
 continuation_indent_width=4
@@ -353,7 +353,7 @@ split_before_named_assigns=False
 #       a_long_var + 100
 #       for a_long_var in xrange(1000)
 #       if a_long_var % 10]
-split_complex_comprehension=True
+split_complex_comprehension=False
 
 # The penalty for splitting right after the opening bracket.
 split_penalty_after_opening_bracket=200
@@ -363,17 +363,17 @@ split_penalty_after_unary_operator=10000
 
 # The penalty of splitting the line around the '+', '-', '*', '/', '//',
 # `%`, and '@' operators.
-split_penalty_arithmetic_operator=200
+split_penalty_arithmetic_operator=300
 
 # The penalty for splitting right before an if expression.
 split_penalty_before_if_expr=100
 
 # The penalty of splitting the line around the '&', '|', and '^' operators.
-split_penalty_bitwise_operator=300
+split_penalty_bitwise_operator=400
 
 # The penalty for splitting a list comprehension or generator
 # expression.
-split_penalty_comprehension=80
+split_penalty_comprehension=900
 
 # The penalty for characters over the column limit.
 split_penalty_excess_character=9000

@@ -21,18 +21,58 @@ __module__ = """tests.context"""
 """This is pythonrepo testing module Template."""
 
 
+__module__ = """tests"""
+
+__name__ = """tests.context"""  # skipcq: PYL-W0622
+
+__doc__ = """
+
+	Robust imports: These statements import the entire "pythonrepo" module,
+		allowing access to all its functionalities within the test environment.
+		This can be flagged as an intentional
+		[cyclic-import](https://pylint.pycqa.org/en/latest/user_guide/messages/refactor/cyclic-import.html)
+		warning.
+
+	Context for Testing.
+
+	Meta Tests - Fixtures:
+
+		Test fixtures by importing test context.
+
+		>>> import tests.context as context
+		>>>
+
+		>>> from context import pythonrepo as _pythonrepo
+		>>>
+
+		>>> from context import profiling as _profiling
+		>>>
+
+"""
+
 try:
 	import sys
-	import os
-	if 'pythonrepo' in __file__:
-		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-except Exception as badErr:
-	baton = ImportError(badErr, str("[CWE-758] Test module failed completely."))
-	baton.module = __module__
-	baton.path = __file__
-	baton.__cause__ = badErr
-	raise baton
+	if not hasattr(sys, 'modules') or not sys.modules:  # pragma: no branch
+		raise ModuleNotFoundError("[CWE-440] sys.modules is not available or empty.") from None
+except ImportError as err:
+	raise ImportError("[CWE-440] Unable to import sys module.") from err
 
+
+try:
+	if 'os' not in sys.modules:
+		import os
+	else:  # pragma: no branch
+		os = sys.modules["""os"""]
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
+
+try:
+	if 'tests.profiling' not in sys.modules:
+		import tests.profiling as profiling
+	else:  # pragma: no branch
+		profiling = sys.modules["""tests.profiling"""]
+except ImportError as err:  # pragma: no branch
+	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
 
 try:
 	import pythonrepo as pythonrepo  # skipcq: PYL-C0414

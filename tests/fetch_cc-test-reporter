@@ -60,7 +60,7 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-ulimit -t 1200
+ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
 LC_ALL="${LANG:1:5}.utf-8"
@@ -76,29 +76,60 @@ test -x "$(command -v shlock)" || exit 126 ;
 test -x "$(command -v gpgv)" || exit 126 ;
 test -x "$(command -v shasum)" || exit 126 ;
 
-# sorry no windows support here
-if [[ $( command uname -s ) == *arwin ]] ; then
-	CI_OS="darwin"
-else
-	CI_OS="linux"
-fi
+# Detect the operating system
+case "$( command uname -s )" in
+	*arwin)
+		CI_OS="darwin"
+		;;
+	Linux)
+		CI_OS="linux"
+		;;
+	*)
+		# sorry no windows support here
+		printf 'Unsupported OS\n' >&2 ;
+		exit 75 ;  # exit code for temporary failure, as per CEP-8
+		;;
+esac
+
+# Detect the architecture
+ARCH="$(command uname -m)"
+case "$ARCH" in
+	x86_64)
+		ARCH="amd64"
+		;;
+	arm64|aarch64|armv8l)
+		ARCH="arm64"
+		;;
+	armv7l|armv6l)
+		ARCH="arm"
+		;;
+	*)
+		# sorry no windows support here
+		printf 'Unsupported architecture\n' >&2 ;
+		exit 75 ;
+		;;
+esac
+
+# Set the CI prefix
+CI_ENV_PREFIX="${CI_OS}-${ARCH}"
 
 function cleanup() {
-	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
-	rm -f ./test-reporter-latest-*-amd64.SHA*.sig 2>/dev/null || true ; wait ;
-	rm -f ./test-reporter-latest-*-amd64.SHA* 2>/dev/null > /dev/null || true ; wait ;
-	hash -d shlock 2>/dev/null > /dev/null || true ;
+	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
+	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.SHA*.sig 2>/dev/null || : ; wait ;
+	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.SHA* 2>/dev/null > /dev/null || : ; wait ;
+	unset CI_ENV_PREFIX 2>/dev/null || :
+	hash -d shlock 2>/dev/null > /dev/null || : ;
 }
 
 if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || : ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
 		# shellcheck disable=SC2046
@@ -124,19 +155,19 @@ fi
 # to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
 	# shellcheck disable=SC2086,SC1091
-	source ./codecov_env 2>/dev/null || true ;
+	source ./codecov_env 2>/dev/null || : ;
 fi
 
 
 #########################
 # actual Work starts here
 #########################
-curl -fLso ./test-reporter-latest-${CI_OS:-linux}-amd64 https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64 ;
+curl -fLso ./test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} ;
 for i in 1 256 512 ; do
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}" ; wait ;
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig" ; wait ;
+	curl -fLso test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}" ; wait ;
+	curl -fLso test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig" ; wait ;
 	# test sha1/sha512 signatures if found and sha256 even if not found
-	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
 		if [[ ${i} -eq 1 ]]; then
 			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
 		fi
@@ -145,27 +176,27 @@ for i in 1 256 512 ; do
 			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
 			# Set CI=true to continue on missing keys
-			gpg --verify test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || ${CI} || EXIT_CODE=126
-			rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig 2>/dev/null ;
+			gpg --verify test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || ${CI} || EXIT_CODE=126
+			rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig 2>/dev/null ;
 		fi
-		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || EXIT_CODE=126
-		rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} 2>/dev/null ;
+		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || EXIT_CODE=126
+		rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} 2>/dev/null ;
 	fi
 done
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	mv -f test-reporter-latest-${CI_OS:-linux}-amd64 ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
-	chmod -v 751 ./cc-test-reporter || EXIT_CODE=126
+	chmod -v 751 ./cc-test-reporter || EXIT_CODE=77
 fi
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./cc-test-reporter before-build || EXIT_CODE=10 ;
+	./cc-test-reporter before-build || EXIT_CODE=125 ;
 fi
 
 
-unset _TEST_ROOT_DIR 2>/dev/null || true ;
+unset _TEST_ROOT_DIR 2>/dev/null || : ;
 
-cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ;
+cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait ;
 
 # goodbye
 exit ${EXIT_CODE:-255} ;

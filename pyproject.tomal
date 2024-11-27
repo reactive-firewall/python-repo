@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools>=75.0", "build>=1.2.1", "wheel>=0.44"]
+build-backend = "setuptools.build_meta"
+
+[pytest.enabler.flake8]
+addopts = "--flake8"
+
+[pytest.enabler.doctest]
+addopts = "--doctest-glob=**/*.py --doctest-modules"
+
+[pytest.enabler.cov]
+addopts = "--cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml"

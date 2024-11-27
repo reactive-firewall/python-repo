@@ -102,7 +102,7 @@ def useTool(tool, *arguments):
 		try:
 			TASK_OPTIONS[tool](arguments)
 		except Exception:
-			w = str("WARNING - An error occured while")
+			w = str("WARNING - An error occurred while")
 			w += str("handling the tool. Abort.")
 			print(w)
 	else:
@@ -117,13 +117,13 @@ def main(*argv):
 			service_cmd = args.some_task
 			useTool(service_cmd, extra)
 		except Exception:
-			w = str("WARNING - An error occured while")
+			w = str("WARNING - An error occurred while")
 			w += str("handling the arguments.")
 			w += str(" Cascading failure.")
 			print(w)
 			sys.exit(2)
 	except Exception:
-		e = str("CRITICAL - An error occured while handling")
+		e = str("CRITICAL - An error occurred while handling")
 		e += str("the cascading failure.")
 		print(e)
 		sys.exit(3)

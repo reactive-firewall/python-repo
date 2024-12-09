@@ -60,6 +60,13 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
+# CAVEAT: This Script is for convience and should not be used as a source of truth
+# when checking crypto hashes.
+
+
+# to check though:
+diff -q <(tail -n 191 "$0" | head -n 189 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
@@ -115,9 +122,12 @@ CI_ENV_PREFIX="${CI_OS}-${ARCH}"
 
 function cleanup() {
 	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
-	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.SHA*.sig 2>/dev/null || : ; wait ;
-	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.SHA* 2>/dev/null > /dev/null || : ; wait ;
+	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.sha*.sig 2>/dev/null || : ; wait ;
+	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.sha* 2>/dev/null > /dev/null || : ; wait ;
+	rm -f ./ds-cli.sh.sha* 2>/dev/null > /dev/null || : ; wait ;
 	unset CI_ENV_PREFIX 2>/dev/null || :
+	unset CI_OS 2>/dev/null || :
+	unset ARCH 2>/dev/null || :
 	hash -d shlock 2>/dev/null > /dev/null || : ;
 }
 
@@ -141,19 +151,22 @@ fi
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR="./" ;
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
+	printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
 else
-	printf "%s\n" "FAIL: missing valid folder or file"
-	EXIT_CODE=1
+	printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" \
+	"FAIL: missing valid repository or source structure" >&2 ;
+	EXIT_CODE=40
 fi
 
 # This File  MUST BE GIT-IGNORED
 # to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
+	printf "::debug::%s\n" "Found codecov_env ..." ;
 	# shellcheck disable=SC2086,SC1091
 	source ./codecov_env 2>/dev/null || : ;
 fi
@@ -171,7 +184,7 @@ for i in 1 256 512 ; do
 		if [[ ${i} -eq 1 ]]; then
 			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
 		fi
-		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig ) ]] ; then
+		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig ) ]] ; then
 			# configure your CI evironment to trust the key at gpg --keyserver  keys.openpgp.org --recv-keys 9BD9E2DD46DA965A537E5B0A5CBF320243B6FD85
 			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
@@ -185,9 +198,49 @@ for i in 1 256 512 ; do
 done
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	mv -f test-reporter-latest-${CI_OS:-linux}-amd64 ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
+	mv -fv ./test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
 	chmod -v 751 ./cc-test-reporter || EXIT_CODE=77
 fi
+
+if [[ -z ${DEEPSOURCE_DSN} ]] && [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	printf "%s\n" "No need for Unconfigured DeepSource." ;
+elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	printf "%s\n" "Detected Config for DeepSource" ;
+
+	# USED FOR INTEGRETY
+	printf "adc12b89f5a41201f7556d4181cf33fa0a5a9964  ds-cli.sh\n" >ds-cli.sh.sha1
+	printf "61e8a49d3d5c49a3614be2bcaaf96e232466fd87c225ecc782e96f4d65dd5bdf  ds-cli.sh\n" >ds-cli.sh.sha256
+	printf "b7232d1e8d73aeb4cefdf3707dd43f0e141b2585fedfd602cb97ec15047de60284f0ed4703b6e98717aebc3aee90e11c26417afbaba1168a5d0a98e22d74f66d  ds-cli.sh\n" >ds-cli.sh.sha512
+
+	curl -fLso ./ds-cli.sh "https://deepsource.io/cli" || EXIT_CODE=125 ;
+
+	for i in 1 256 512 ; do
+		# test sha1/sha512 signatures if found and sha256 even if not found
+		if [[ ( -r ds-cli.sh.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+			if [[ ${i} -eq 1 ]]; then
+				printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
+			fi
+			shasum -a $i -c --ignore-missing ds-cli.sh.sha${i} || EXIT_CODE=126
+			rm -vf ds-cli.sh.sha${i} 2>/dev/null ;
+		fi
+	done
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		chmod -v 751 ./ds-cli.sh || EXIT_CODE=77
+		chmod +x ./ds-cli.sh || : ;
+	fi ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
+		{ sh ./ds-cli.sh ;} || EXIT_CODE=$? ; wait ;
+	fi ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		# ref: https://docs.deepsource.com/docs/cli#commands
+		./bin/deepsource config validate || EXIT_CODE=$? ;
+	fi ;
+	wait ;
+fi ;
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	./cc-test-reporter before-build || EXIT_CODE=125 ;
@@ -200,3 +253,6 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 
 # goodbye
 exit ${EXIT_CODE:-255} ;
+
+# This file's code hash:
+c1c7061d8f7686b221742d3b85c4a14db9699225f1766b6fbd68053642e1aea524736b93445554a1af14ed933ada4ed9  -

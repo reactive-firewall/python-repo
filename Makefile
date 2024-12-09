@@ -176,14 +176,14 @@ init:
 
 install: init build must_be_root
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -e "git+https://github.com/reactive-firewall/python-repo.git#egg=pythonrepo"
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 user-install: build
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user "pip>=24.3.1" "setuptools>=75.0" "wheel>=0.44" "build>=1.1.1" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -r "https://raw.githubusercontent.com/reactive-firewall/python-repo/stable/requirements.txt" 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) --user -e "git+https://github.com/reactive-firewall/python-repo.git#egg=pythonrepo"
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 uninstall:
@@ -200,6 +200,7 @@ legacy-purge: clean uninstall
 
 purge: legacy-purge
 	$(QUIET)$(RM) ./cc-test-reporter 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./ds-cli.sh 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RM) ./test-reports/*.xml 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
@@ -209,15 +210,15 @@ test-reports:
 	$(QUIET)$(BSMARK) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-reqs: test-reports init
+test-reqs: cc-test-reporter test-reports init
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
 
 just-test: cleanup
 	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
-	$(QUITE)$(WAIT) ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
-test: just-test
+test: just-test cc-test-reporter
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
@@ -227,9 +228,11 @@ test-tox: cleanup
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-pytest: cleanup MANIFEST.in must_have_pytest test-reports
+test-pytest: cleanup MANIFEST.in cc-test-reporter must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
-	$(QUITE)$(WAIT) ;
+	$(QUIET)./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml || : ;
+	$(QUIET)./cc-test-reporter after-build --exit-code 0 -t coverage.py -r $(CC_TEST_REPORTER_ID) || : ;
+	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -237,6 +240,12 @@ test-style: cleanup
 	$(QUIET)$(PYTHON) -m flake8 --ignore=W191,W391 --max-line-length=100 --verbose --count --config=.flake8.ini --show-source || DO_FAIL="exit 2" ;
 	$(QUIET)tests/check_cc_lines 2>/dev/null || true
 	$(QUIET)tests/check_spelling 2>/dev/null || true
+	$(QUIET)$(ECHO) "$@: Done."
+
+cc-test-reporter: tests/fetch_cc-test-reporter
+	$(QUIET)tests/fetch_cc-test-reporter ;
+	$(QUIET)$(WAIT) ;
+	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 must_have_flake:

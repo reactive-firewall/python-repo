@@ -70,7 +70,7 @@ diff -q <(tail -n 191 "$0" | head -n 189 | shasum -a 384 -t -) <(tail -n 1 "$0")
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
-LC_ALL="${LANG:1:5}.utf-8"
+LC_ALL="${LANG:0:5}.utf-8"
 umask 127
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
@@ -255,4 +255,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-c1c7061d8f7686b221742d3b85c4a14db9699225f1766b6fbd68053642e1aea524736b93445554a1af14ed933ada4ed9  -
+bd3a1cfef39983285334fad565c7a0643c208c3a7fb1a6aa4d19d44b537d21a5e2f8f13dbe3ed133e6f1435ed30c50ac  -

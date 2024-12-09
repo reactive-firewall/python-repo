@@ -60,10 +60,17 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-ulimit -t 1200
+# CAVEAT: This Script is for convience and should not be used as a source of truth
+# when checking crypto hashes.
+
+
+# to check though:
+diff -q <(tail -n 191 "$0" | head -n 189 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+
+ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
-LC_ALL="${LANG:1:5}.utf-8"
+LC_ALL="${LANG:0:5}.utf-8"
 umask 127
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
@@ -76,29 +83,63 @@ test -x "$(command -v shlock)" || exit 126 ;
 test -x "$(command -v gpgv)" || exit 126 ;
 test -x "$(command -v shasum)" || exit 126 ;
 
-# sorry no windows support here
-if [[ $( command uname -s ) == *arwin ]] ; then
-	CI_OS="darwin"
-else
-	CI_OS="linux"
-fi
+# Detect the operating system
+case "$( command uname -s )" in
+	*arwin)
+		CI_OS="darwin"
+		;;
+	Linux)
+		CI_OS="linux"
+		;;
+	*)
+		# sorry no windows support here
+		printf 'Unsupported OS\n' >&2 ;
+		exit 75 ;  # exit code for temporary failure, as per CEP-8
+		;;
+esac
+
+# Detect the architecture
+ARCH="$(command uname -m)"
+case "$ARCH" in
+	x86_64)
+		ARCH="amd64"
+		;;
+	arm64|aarch64|armv8l)
+		ARCH="arm64"
+		;;
+	armv7l|armv6l)
+		ARCH="arm"
+		;;
+	*)
+		# sorry no windows support here
+		printf 'Unsupported architecture\n' >&2 ;
+		exit 75 ;
+		;;
+esac
+
+# Set the CI prefix
+CI_ENV_PREFIX="${CI_OS}-${ARCH}"
 
 function cleanup() {
-	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
-	rm -f ./test-reporter-latest-*-amd64.SHA*.sig 2>/dev/null || true ; wait ;
-	rm -f ./test-reporter-latest-*-amd64.SHA* 2>/dev/null > /dev/null || true ; wait ;
-	hash -d shlock 2>/dev/null > /dev/null || true ;
+	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
+	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.sha*.sig 2>/dev/null || : ; wait ;
+	rm -f ./test-reporter-latest-${CI_ENV_PREFIX}.sha* 2>/dev/null > /dev/null || : ; wait ;
+	rm -f ./ds-cli.sh.sha* 2>/dev/null > /dev/null || : ; wait ;
+	unset CI_ENV_PREFIX 2>/dev/null || :
+	unset CI_OS 2>/dev/null || :
+	unset ARCH 2>/dev/null || :
+	hash -d shlock 2>/dev/null > /dev/null || : ;
 }
 
 if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
 		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || : ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
 		# shellcheck disable=SC2046
@@ -110,62 +151,108 @@ fi
 # this is how test files are found:
 
 # THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR="./" ;
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null) ;
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
+	printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
 else
-	printf "%s\n" "FAIL: missing valid folder or file"
-	EXIT_CODE=1
+	printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" \
+	"FAIL: missing valid repository or source structure" >&2 ;
+	EXIT_CODE=40
 fi
 
 # This File  MUST BE GIT-IGNORED
 # to be SAFELY USED to store Tokens and env vars (update logic as needed)
 if [[ ( -r ./codecov_env ) ]] ; then
+	printf "::debug::%s\n" "Found codecov_env ..." ;
 	# shellcheck disable=SC2086,SC1091
-	source ./codecov_env 2>/dev/null || true ;
+	source ./codecov_env 2>/dev/null || : ;
 fi
 
 
 #########################
 # actual Work starts here
 #########################
-curl -fLso ./test-reporter-latest-${CI_OS:-linux}-amd64 https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64 ;
+curl -fLso ./test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} ;
 for i in 1 256 512 ; do
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}" ; wait ;
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig" ; wait ;
+	curl -fLso test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}" ; wait ;
+	curl -fLso test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig" ; wait ;
 	# test sha1/sha512 signatures if found and sha256 even if not found
-	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
 		if [[ ${i} -eq 1 ]]; then
 			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
 		fi
-		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig ) ]] ; then
+		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig ) ]] ; then
 			# configure your CI evironment to trust the key at gpg --keyserver  keys.openpgp.org --recv-keys 9BD9E2DD46DA965A537E5B0A5CBF320243B6FD85
 			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
 			# Set CI=true to continue on missing keys
-			gpg --verify test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || ${CI} || EXIT_CODE=126
-			rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig 2>/dev/null ;
+			gpg --verify test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || ${CI} || EXIT_CODE=126
+			rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig 2>/dev/null ;
 		fi
-		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || EXIT_CODE=126
-		rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} 2>/dev/null ;
+		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || EXIT_CODE=126
+		rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} 2>/dev/null ;
 	fi
 done
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	mv -f test-reporter-latest-${CI_OS:-linux}-amd64 ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
-	chmod -v 751 ./cc-test-reporter || EXIT_CODE=126
+	mv -fv ./test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
+	chmod -v 751 ./cc-test-reporter || EXIT_CODE=77
 fi
+
+if [[ -z ${DEEPSOURCE_DSN} ]] && [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	printf "%s\n" "No need for Unconfigured DeepSource." ;
+elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+	printf "%s\n" "Detected Config for DeepSource" ;
+
+	# USED FOR INTEGRETY
+	printf "adc12b89f5a41201f7556d4181cf33fa0a5a9964  ds-cli.sh\n" >ds-cli.sh.sha1
+	printf "61e8a49d3d5c49a3614be2bcaaf96e232466fd87c225ecc782e96f4d65dd5bdf  ds-cli.sh\n" >ds-cli.sh.sha256
+	printf "b7232d1e8d73aeb4cefdf3707dd43f0e141b2585fedfd602cb97ec15047de60284f0ed4703b6e98717aebc3aee90e11c26417afbaba1168a5d0a98e22d74f66d  ds-cli.sh\n" >ds-cli.sh.sha512
+
+	curl -fLso ./ds-cli.sh "https://deepsource.io/cli" || EXIT_CODE=125 ;
+
+	for i in 1 256 512 ; do
+		# test sha1/sha512 signatures if found and sha256 even if not found
+		if [[ ( -r ds-cli.sh.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+			if [[ ${i} -eq 1 ]]; then
+				printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
+			fi
+			shasum -a $i -c --ignore-missing ds-cli.sh.sha${i} || EXIT_CODE=126
+			rm -vf ds-cli.sh.sha${i} 2>/dev/null ;
+		fi
+	done
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		chmod -v 751 ./ds-cli.sh || EXIT_CODE=77
+		chmod +x ./ds-cli.sh || : ;
+	fi ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
+		{ sh ./ds-cli.sh ;} || EXIT_CODE=$? ; wait ;
+	fi ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		# ref: https://docs.deepsource.com/docs/cli#commands
+		./bin/deepsource config validate || EXIT_CODE=$? ;
+	fi ;
+	wait ;
+fi ;
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./cc-test-reporter before-build || EXIT_CODE=10 ;
+	./cc-test-reporter before-build || EXIT_CODE=125 ;
 fi
 
 
-unset _TEST_ROOT_DIR 2>/dev/null || true ;
+unset _TEST_ROOT_DIR 2>/dev/null || : ;
 
-cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ;
+cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait ;
 
 # goodbye
 exit ${EXIT_CODE:-255} ;
+
+# This file's code hash:
+bd3a1cfef39983285334fad565c7a0643c208c3a7fb1a6aa4d19d44b537d21a5e2f8f13dbe3ed133e6f1435ed30c50ac  -

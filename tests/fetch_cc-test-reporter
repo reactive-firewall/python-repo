@@ -251,7 +251,7 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
 		printf "::group::%s\n" "Running ./ds-cli.sh" ;
-		time { cat ./ds-cli.sh | sh ;} || EXIT_CODE=$? ; wait ;
+		time { cat ./ds-cli.sh | sh ;} ; wait ;
 		printf "::endgroup::\n" ;
 		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 			printf "::debug::%s\n" "Checking for DeepSource CLI" ;
@@ -304,4 +304,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-bee43a56d600679736436b75cc9957dd2b6c14045498772a4c5e919449a74088a48c155ff70072be0ae5a268aa854bfe  -
+b444b5d3e9093ee01e78a8fe991e60d0f6d48218fbb13cf8d3e6d06705a4289a7def2fcfe44758328c76572633cfd4ad  -

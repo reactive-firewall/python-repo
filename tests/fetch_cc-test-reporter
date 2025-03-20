@@ -65,7 +65,7 @@
 
 
 # to check though:
-diff -q <(tail -n 229 "$0" | head -n 227 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+diff -q <(tail -n 234 "$0" | head -n 232 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
 
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
@@ -298,4 +298,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-c107fcd6c083b3fcfe410ce7fa6017a27c519172511d959f52ded59cd8af8e8648dcd58ff27d624df32284d1a9a4289a  -
+f655d5970127b38f5066a87c0ecbc9f413fe899816f7695b24b99eedae25e5c44ee278e9d394613db7d4d4b1b6a567c6  -

@@ -222,6 +222,7 @@ test: just-test cc-test-reporter
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)./cc-test-reporter after-build --exit-code 0 -t coverage.py 2>/dev/null || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -231,7 +232,7 @@ test-tox: cleanup
 test-pytest: cleanup MANIFEST.in cc-test-reporter must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
 	$(QUIET)./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml || : ;
-	$(QUIET)./cc-test-reporter after-build --exit-code 0 -t coverage.py -r $(CC_TEST_REPORTER_ID) || : ;
+	$(QUIET)./cc-test-reporter after-build --exit-code 0 -t coverage.py 2>/dev/null || : ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."

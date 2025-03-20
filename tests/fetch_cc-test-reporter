@@ -158,7 +158,7 @@ if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null);
 	fi
 	printf "::debug::%s\n" "Found ${_TEST_ROOT_DIR} ..." ;
 else
-	printf "::error file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}::%s\n" \
+	printf "::error %s::%s\n" "file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}" \
 	"FAIL: missing valid repository or source structure" >&2 ;
 	EXIT_CODE=40
 fi
@@ -227,7 +227,6 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		chmod -v 751 ./ds-cli.sh || EXIT_CODE=77
-		chmod +x ./ds-cli.sh || : ;
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
@@ -255,4 +254,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-bd3a1cfef39983285334fad565c7a0643c208c3a7fb1a6aa4d19d44b537d21a5e2f8f13dbe3ed133e6f1435ed30c50ac  -
+162c5fd711e080b71f4943c910cec820eda71160c4a3c4af1d981104d5d2546e3d71a8b75a8ef1061d654e928becf0e1  -

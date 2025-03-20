@@ -58,18 +58,6 @@ jobs:
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
-          - python-version: 3.7
-            lang-var: "en_US.utf-8"
-            experimental: true
-          - python-version: 3.8
-            lang-var: "en_US.utf-8"
-            experimental: true
-          - python-version: 3.9
-            lang-var: "de.utf-8"
-            experimental: true
-          - python-version: 3.9
-            lang-var: "jp.utf-8"
-            experimental: true
           - python-version: 3.9
             lang-var: "en_US.utf-8"
             experimental: false

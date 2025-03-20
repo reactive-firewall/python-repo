@@ -189,7 +189,7 @@ for i in 1 256 512 ; do
 			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
 			# Set CI=true to continue on missing keys
-			gpg --verify test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || ${CI} || EXIT_CODE=126
+			gpg --verify test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || ${CI} 2>/dev/null || ${CIRCLECI} 2>/dev/null || EXIT_CODE=126
 			rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig 2>/dev/null ;
 		fi
 		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || EXIT_CODE=126
@@ -254,4 +254,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-162c5fd711e080b71f4943c910cec820eda71160c4a3c4af1d981104d5d2546e3d71a8b75a8ef1061d654e928becf0e1  -
+162b42710735f3bad7c4912f5053d77ad52809bb53ad80bf250bf0b1af4dce6df2d12744328159ce06e2ce00a4c21e6bee8  -

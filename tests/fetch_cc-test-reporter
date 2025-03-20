@@ -65,12 +65,13 @@
 
 
 # to check though:
-diff -q <(tail -n 228 "$0" | head -n 226 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+diff -q <(tail -n 229 "$0" | head -n 227 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
 
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
 LC_ALL="${LANG:0:5}.utf-8"
+export BINDIR="${BINDIR:-./bin}"
 umask 127
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
@@ -118,7 +119,14 @@ case "$ARCH" in
 esac
 
 # Set the CI prefix
-CI_ENV_PREFIX="${CI_OS}-${ARCH}"
+case "${CI_OS:-Linux}" in
+	*arwin)
+		CI_ENV_PREFIX="${CI_OS}-amd64"
+		;;
+	*)
+		CI_ENV_PREFIX="${CI_OS}-${ARCH}"
+		;;
+esac
 
 function cleanup() {
 	rm -f "${LOCK_FILE}" 2>/dev/null || : ; wait ;
@@ -175,12 +183,12 @@ fi
 #########################
 # actual Work starts here
 #########################
-curl -fLso ./test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} ;
+curl -fLso ./test-reporter-latest-${CI_ENV_PREFIX} https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX} ;
 for i in 1 256 512 ; do
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}" ; wait ;
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig" ; wait ;
+	curl -fLso test-reporter-latest-${CI_ENV_PREFIX}.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX}.sha${i}" ; wait ;
+	curl -fLso test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig" ; wait ;
 	# test sha1/sha512 signatures if found and sha256 even if not found
-	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
+	if [[ ( -r test-reporter-latest-${CI_ENV_PREFIX}.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
 		if [[ ${i} -eq 1 ]]; then
 			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
 		fi
@@ -189,16 +197,16 @@ for i in 1 256 512 ; do
 			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
 			# Set CI=true to continue on missing keys
-			gpg --verify test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || ${CI} 2>/dev/null || ${CIRCLECI} 2>/dev/null || EXIT_CODE=126
-			rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig 2>/dev/null ;
+			gpg --verify test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig test-reporter-latest-${CI_ENV_PREFIX}.sha${i} || ${CI} 2>/dev/null || ${CIRCLECI} 2>/dev/null || EXIT_CODE=126
+			rm -vf test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig 2>/dev/null ;
 		fi
-		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} || EXIT_CODE=126
-		rm -vf test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i} 2>/dev/null ;
+		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_ENV_PREFIX}.sha${i} || EXIT_CODE=126
+		rm -vf test-reporter-latest-${CI_ENV_PREFIX}.sha${i} 2>/dev/null ;
 	fi
 done
 
 if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	mv -fv ./test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64} ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
+	mv -fv ./test-reporter-latest-${CI_ENV_PREFIX} ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
 	chmod -v 751 ./cc-test-reporter || EXIT_CODE=77
 fi
 
@@ -241,30 +249,30 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		printf "::endgroup::\n" ;
 		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 			printf "::debug::%s\n" "Checking for DeepSource CLI" ;
-			if [[ ( -d ./bin ) ]] ; then
-				printf "::debug::==> %s\n" "Found ./bin directory." ;
-				if [[ ( -x ./bin/deepsource ) ]] ; then
-					printf "::debug::    ==> %s\n" "Found ./bin/deepsource CLI tool" ;
-				elif [[ ( -r ./bin/deepsource ) || ( -e ./bin/deepsource ) ]] ; then
-					printf "::debug::    ==> %s\n" "Found ./bin/deepsource file. Permission Error" ;
-					printf "::debug::        ==> %s\n" "Trying to apply permission corrections" ;
-					chmod -v 751 ./bin/deepsource || EXIT_CODE=77 ;
-					if [[ ( ${EXIT_CODE} -eq 0 ) ]] && [[ ( -x ./bin/deepsource ) ]] ; then
-						printf "::debug::        ==> %s\n" "Fixed ./bin/deepsource CLI tool" ;
+			if [[ ( -d "${BINDIR}" ) ]] ; then
+				printf "::debug::=> %s\n" "Found ${BINDIR} directory." ;
+				if [[ ( -x "${BINDIR}"/deepsource ) ]] ; then
+					printf "::debug::..=> %s\n" "Found ${BINDIR}/deepsource CLI tool" ;
+				elif [[ ( -r "${BINDIR}"/deepsource ) || ( -e "${BINDIR}"/deepsource ) ]] ; then
+					printf "::debug::..=> %s\n" "Found ${BINDIR}/deepsource file." ;
+					printf "::debug::....=> %s\n" "Trying to apply permission corrections" ;
+					chmod -v 751 "${BINDIR}"/deepsource || EXIT_CODE=77 ;
+					if [[ ( ${EXIT_CODE} -eq 0 ) ]] && [[ ( -x "${BINDIR}"/deepsource ) ]] ; then
+						printf "::debug::......=> %s\n" "Fixed ${BINDIR}/deepsource CLI tool" ;
 					else
-						printf "::debug::    ==> %s\n" "Applying corrections Unsuccessful" ;
+						printf "::debug::....=> %s\n" "Applying corrections Unsuccessful" ;
 						EXIT_CODE=77 ;
 					fi ;
 				else
-					printf "::debug::    ==> %s\n" "Missing ./bin/deepsource CLI tool" ;
+					printf "::debug::..=> %s\n" "Missing ${BINDIR}/deepsource CLI tool" ;
 					EXIT_CODE=125 ;
-					printf "::debug::    ==> %s\n" "Checking if bin is empty:" ;
-					readonly BIN_FILES=$( ls -1 ./bin 2>/dev/null ;)
-					printf "::debug::    ==> %s\n" "${BIN_FILES}" ;
+					printf "::debug::..=> %s\n" "Checking if ${BINDIR} is empty:" ;
+					readonly BIN_FILES=$( ls -1 "${BINDIR}" 2>/dev/null ;)
+					printf "::debug::..=> %s\n" "${BIN_FILES}" ;
 					unset $BIN_FILES 2>/dev/null || : ;
 				fi ;
 			else
-				printf "::debug::==> %s\n" "Missing ./bin directory." ;
+				printf "::debug::=> %s\n" "Missing ${BINDIR} directory." ;
 				EXIT_CODE=125 ;
 			fi ;
 		fi ;
@@ -290,4 +298,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-99229c350d321d5557c1833263cdbe4b09271ad374d4f81eb08d19d8ae00c922e3764eaf7ccfb506f6e58171c2ecf5f6  -
+c107fcd6c083b3fcfe410ce7fa6017a27c519172511d959f52ded59cd8af8e8648dcd58ff27d624df32284d1a9a4289a  -

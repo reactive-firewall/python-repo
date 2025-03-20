@@ -193,13 +193,13 @@ jobs:
         pip install --upgrade "pip>=24.3.1" "setuptools>=45.0" "wheel>=0.37" ;
         pip install -r ./requirements.txt ;
         pip install -r ./test-requirements.txt || true ;
+    - name: Pre-Clean
+      id: clean
+      run: make -j1 -f Makefile clean || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       run: ./tests/fetch_cc-test-reporter || true ;
-    - name: Pre-Clean
-      id: clean
-      run: make -j1 -f Makefile clean || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
       if: ${{ runner.python-version == '3.9' }}
       run: make -f Makefile test ;

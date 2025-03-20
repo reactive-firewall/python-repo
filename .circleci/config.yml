@@ -43,7 +43,7 @@ jobs:
           shell: /bin/bash
           name: "install test depends attempt"
           command: |
-            python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
+            python3 -m pip install --upgrade --user -r ./tests-requirements.txt || : ;
           when: on_success
       - save_cache:
           key: v1-repo-{{ .Environment.CIRCLE_SHA1 }}
@@ -69,7 +69,7 @@ jobs:
           shell: /bin/bash
           name: "Installing deps for test"
           command: |
-            python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
+            python3 -m pip install --upgrade --user -r ./tests-requirements.txt || : ;
           when: on_success
       - cleanup
       - run:
@@ -105,7 +105,7 @@ jobs:
           shell: /bin/bash
           name: "clean up for test"
           command: |
-            python3 -m pip install --upgrade --user -r ./tests/requirements.txt || : ;
+            python3 -m pip install --upgrade --user -r ./tests-requirements.txt || : ;
           when: on_success
       - cleanup
       - run:
@@ -143,7 +143,7 @@ jobs:
       - run:
           name: "install test-reqs attempt"
           command: |
-            python3 -m pip install --user -r ./tests/requirements.txt || : ;
+            python3 -m pip install --user -r ./tests-requirements.txt || : ;
       - cleanup
       - run:
           shell: /bin/bash

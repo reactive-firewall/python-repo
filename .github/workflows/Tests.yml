@@ -199,10 +199,7 @@ jobs:
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
-      run: |
-        ./tests/fetch_cc-test-reporter || true ;
-        ls -lap . || true ;
-        ls -lap bin || true ;
+      run: ./tests/fetch_cc-test-reporter || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
       if: ${{ runner.python-version == '3.9' }}
       run: make -f Makefile test ;

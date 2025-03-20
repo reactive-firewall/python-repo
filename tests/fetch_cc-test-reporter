@@ -65,7 +65,7 @@
 
 
 # to check though:
-diff -q <(tail -n 234 "$0" | head -n 232 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+diff -q <(tail -n 240 "$0" | head -n 238 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
 
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
@@ -79,6 +79,7 @@ EXIT_CODE=0
 
 test -x "$(command -v grep)" || exit 126 ;
 test -x "$(command -v curl)" || exit 126 ;
+test -x "$(command -v mkdir)" || exit 126 ;
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 test -x "$(command -v shlock)" || exit 126 ;
 test -x "$(command -v gpgv)" || exit 126 ;
@@ -241,6 +242,11 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		printf "::debug::%s\n" "Validated ds-cli.sh for DeepSource" ;
 		chmod -v 751 ./ds-cli.sh || EXIT_CODE=77
 	fi ;
+	
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::debug::%s\n" "Creating ${BINDIR} directory for DeepSource" ;
+		mkdir -v -m 755 "${BINDIR}" || EXIT_CODE=66
+	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
@@ -265,7 +271,7 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 					fi ;
 				else
 					printf "::debug::..=> %s\n" "Missing ${BINDIR}/deepsource CLI tool" ;
-					EXIT_CODE=125 ;
+					EXIT_CODE=66 ;
 					printf "::debug::..=> %s\n" "Checking if ${BINDIR} is empty:" ;
 					readonly BIN_FILES=$( ls -1 "${BINDIR}" 2>/dev/null ;)
 					printf "::debug::..=> %s\n" "${BIN_FILES}" ;
@@ -298,4 +304,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-c7f8f4f1cf337ce97fe32916af5507aa252f7ec441eb6105fcf3fe32d5463994e8889539cff613f5dfff802324fb0bc0  -
+bee43a56d600679736436b75cc9957dd2b6c14045498772a4c5e919449a74088a48c155ff70072be0ae5a268aa854bfe  -

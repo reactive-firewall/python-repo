@@ -65,7 +65,7 @@
 
 
 # to check though:
-diff -q <(tail -n 191 "$0" | head -n 189 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+diff -q <(tail -n 228 "$0" | head -n 226 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
 
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
@@ -214,6 +214,10 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	curl -fLso ./ds-cli.sh "https://deepsource.io/cli" || EXIT_CODE=125 ;
 
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::debug::%s\n" "Downloaded ds-cli.sh for DeepSource" ;
+	fi ;
+
 	for i in 1 256 512 ; do
 		# test sha1/sha512 signatures if found and sha256 even if not found
 		if [[ ( -r ds-cli.sh.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
@@ -226,12 +230,44 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	done
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::debug::%s\n" "Validated ds-cli.sh for DeepSource" ;
 		chmod -v 751 ./ds-cli.sh || EXIT_CODE=77
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
+		printf "::group::%s\n" "Running ./ds-cli.sh" ;
 		{ sh ./ds-cli.sh ;} || EXIT_CODE=$? ; wait ;
+		printf "::endgroup::\n" ;
+		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+			printf "::debug::%s\n" "Checking for DeepSource CLI" ;
+			if [[ ( -d ./bin ) ]] ; then
+				printf "::debug::==> %s\n" "Found ./bin directory." ;
+				if [[ ( -x ./bin/deepsource ) ]] ; then
+					printf "::debug::    ==> %s\n" "Found ./bin/deepsource CLI tool" ;
+				elif [[ ( -r ./bin/deepsource ) || ( -e ./bin/deepsource ) ]] ; then
+					printf "::debug::    ==> %s\n" "Found ./bin/deepsource file. Permission Error" ;
+					printf "::debug::        ==> %s\n" "Trying to apply permission corrections" ;
+					chmod -v 751 ./bin/deepsource || EXIT_CODE=77 ;
+					if [[ ( ${EXIT_CODE} -eq 0 ) ]] && [[ ( -x ./bin/deepsource ) ]] ; then
+						printf "::debug::        ==> %s\n" "Fixed ./bin/deepsource CLI tool" ;
+					else
+						printf "::debug::    ==> %s\n" "Applying corrections Unsuccessful" ;
+						EXIT_CODE=77 ;
+					if
+				else
+					printf "::debug::    ==> %s\n" "Missing ./bin/deepsource CLI tool" ;
+					EXIT_CODE=125 ;
+					printf "::debug::    ==> %s\n" "Checking if bin is empty:" ;
+					readonly BIN_FILES=$( ls -1 ./bin 2>/dev/null ;)
+					printf "::debug::    ==> %s\n" "${BIN_FILES}" ;
+					unset $BIN_FILES 2>/dev/null || : ;
+				fi ;
+			else
+				printf "::debug::==> %s\n" "Missing ./bin directory." ;
+				EXIT_CODE=125 ;
+			fi ;
+		fi ;
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
@@ -254,4 +290,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-b42710735f3bad7c4912f5053d77ad52809bb53ad80bf250bf0b1af4dce6df2d12744328159ce06e2ce00a4c21e6bee8  -
+a3ffe4db431f0e6b2d32e6f4969a848da9b14257ae3461e968352825ab50ae7db48fd20359378c49d7f7e3ec2f3402d3  -

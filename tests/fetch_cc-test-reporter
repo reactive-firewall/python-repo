@@ -254,7 +254,7 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 					else
 						printf "::debug::    ==> %s\n" "Applying corrections Unsuccessful" ;
 						EXIT_CODE=77 ;
-					if
+					fi ;
 				else
 					printf "::debug::    ==> %s\n" "Missing ./bin/deepsource CLI tool" ;
 					EXIT_CODE=125 ;
@@ -290,4 +290,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-a3ffe4db431f0e6b2d32e6f4969a848da9b14257ae3461e968352825ab50ae7db48fd20359378c49d7f7e3ec2f3402d3  -
+99229c350d321d5557c1833263cdbe4b09271ad374d4f81eb08d19d8ae00c922e3764eaf7ccfb506f6e58171c2ecf5f6  -

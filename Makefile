@@ -111,10 +111,10 @@ else ifeq ($(shell uname -s), Linux)
 	PIP_ENV_FLAGS :=
 else
 	PIP_ENV_FLAGS :=
-	FETCH_CC_TOOL :=
-	CC_TOOL :=
+	FETCH_CC_TOOL := :
+	CC_TOOL := :
 	CC_TOOL_ARGS :=
-	DS_TOOL :=
+	DS_TOOL := :
 	DS_TOOL_ARGS :=
 endif
 
@@ -259,7 +259,7 @@ test-style: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 cc-test-reporter: tests/fetch_cc-test-reporter
-	$(QUIET)$(FETCH_CC_TOOL) ;
+	$(QUIET)$(FETCH_CC_TOOL) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."

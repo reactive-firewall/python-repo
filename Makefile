@@ -91,16 +91,31 @@ else
 	endif
 endif
 
+ifndef CC_TOOL
+	FETCH_CC_TOOL := tests/fetch_cc-test-reporter
+	CC_TOOL := ./cc-test-reporter
+	CC_TOOL_ARGS := after-build --exit-code 0 -t coverage.py
+	DS_TOOL := ./bin/deepsource
+	DS_TOOL_ARGS := report --analyzer test-coverage --key python --value-file ./coverage.xml
+endif
+
 ifndef PIP_COMMON_FLAGS
 	# Define common pip install flags
 	PIP_COMMON_FLAGS := --use-pep517 --exists-action s --upgrade --upgrade-strategy eager
 endif
 
-# Define environment-specific pip install flags
-ifeq ($(shell uname),Darwin)
+# Define environment-specific flags
+ifeq ($(shell uname -s), Darwin)
 	PIP_ENV_FLAGS := --break-system-packages
+else ifeq ($(shell uname -s), Linux)
+	PIP_ENV_FLAGS :=
 else
 	PIP_ENV_FLAGS :=
+	FETCH_CC_TOOL :=
+	CC_TOOL :=
+	CC_TOOL_ARGS :=
+	DS_TOOL :=
+	DS_TOOL_ARGS :=
 endif
 
 ifeq "$(WAIT)" ""
@@ -222,7 +237,7 @@ test: just-test cc-test-reporter
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)./cc-test-reporter after-build --exit-code 0 -t coverage.py 2>/dev/null || : ;
+	$(QUIET)$(CC_TOOL) $(CC_TOOL_ARGS) 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-tox: cleanup
@@ -231,8 +246,8 @@ test-tox: cleanup
 
 test-pytest: cleanup MANIFEST.in cc-test-reporter must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
-	$(QUIET)./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml || : ;
-	$(QUIET)./cc-test-reporter after-build --exit-code 0 -t coverage.py 2>/dev/null || : ;
+	$(QUIET)$(DS_TOOL) $(DS_TOOL_ARGS) || : ;
+	$(QUIET)$(CC_TOOL) $(CC_TOOL_ARGS) 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
@@ -244,7 +259,7 @@ test-style: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 cc-test-reporter: tests/fetch_cc-test-reporter
-	$(QUIET)tests/fetch_cc-test-reporter ;
+	$(QUIET)$(FETCH_CC_TOOL) ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."

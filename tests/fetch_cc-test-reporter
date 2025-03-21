@@ -272,14 +272,14 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		printf "::debug::%s\n" "Validated deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz for DeepSource" ;
-		tar --no-same-owner -xzf "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" -C "${BINDIR}" || EXIT_CODE=77 ;
+		tar --no-same-owner -xzf "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" -C "${BINDIR}" 2>/dev/null || : ;
 		rm -f "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" 2>/dev/null || EXIT_CODE=77 ;
 		rm -fRd "${BINDIR}"/completions/ 2>/dev/null || : ;
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
-		#printf "::group::%s\n" "Running ./ds-cli.sh" ;
+		printf "::debug::%s\n" "Extracted deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" ;
 		#{ cat ./ds-cli.sh | sh - | grep -o "(:?version).{1}\s[0-9].[0-9].[0-9]" ;} ; wait ;
 		#printf "::endgroup::\n" ;
 		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
@@ -333,4 +333,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-779f220ba3f753ed3e929121e0742fe6362d779be1dfff7dda258e04b4fb95412e740b5f4ad5319b8ca61c79151cd735  -
+f606b901a37e190d4d0a3e3f6945dda08598de00f182e212a3805c05e6110d5cde47fa492b549add4446124c14ed45f4  -

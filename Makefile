@@ -216,6 +216,8 @@ legacy-purge: clean uninstall
 purge: legacy-purge
 	$(QUIET)$(RM) ./cc-test-reporter 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RM) ./ds-cli.sh 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RM) ./bin/deepsource 2>$(ERROR_LOG_PATH) || :
+	$(QUIET)$(RMDIR) ./bin/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RM) ./test-reports/*.xml 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."

@@ -65,25 +65,28 @@
 
 
 # to check though:
-diff -q <(tail -n 240 "$0" | head -n 238 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+diff -q <(tail -n 269 "$0" | head -n 267 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
 
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
 LANG=${LANG:-"en_US"}
 LC_ALL="${LANG:0:5}.utf-8"
-export BINDIR="${BINDIR:-./bin}"
+BINDIR="${BINDIR:-./bin}"
+DS_TAG="0.8.6"  # circa 2025
 umask 127
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
 EXIT_CODE=0
 
 test -x "$(command -v grep)" || exit 126 ;
+test -x "$(command -v sed)" || exit 126 ;
 test -x "$(command -v curl)" || exit 126 ;
 test -x "$(command -v mkdir)" || exit 126 ;
 hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
 test -x "$(command -v shlock)" || exit 126 ;
 test -x "$(command -v gpgv)" || exit 126 ;
 test -x "$(command -v shasum)" || exit 126 ;
+test -x "$(command -v tar)" || exit 126 ;
 
 # Detect the operating system
 case "$( command uname -s )" in
@@ -216,43 +219,69 @@ if [[ -z ${DEEPSOURCE_DSN} ]] && [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	printf "%s\n" "Detected Config for DeepSource" ;
 
-	# USED FOR INTEGRETY
-	printf "adc12b89f5a41201f7556d4181cf33fa0a5a9964  ds-cli.sh\n" >ds-cli.sh.sha1
-	printf "61e8a49d3d5c49a3614be2bcaaf96e232466fd87c225ecc782e96f4d65dd5bdf  ds-cli.sh\n" >ds-cli.sh.sha256
-	printf "b7232d1e8d73aeb4cefdf3707dd43f0e141b2585fedfd602cb97ec15047de60284f0ed4703b6e98717aebc3aee90e11c26417afbaba1168a5d0a98e22d74f66d  ds-cli.sh\n" >ds-cli.sh.sha512
+	# Make an API call to GitHub to get the latest release with the Accept header
+	response=$(curl -s -H "Accept: application/json" "https://api.github.com/repos/DeepSourceCorp/cli/releases/latest")
 
-	curl -fLso ./ds-cli.sh "https://deepsource.io/cli" || EXIT_CODE=125 ;
-
-	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-		printf "::debug::%s\n" "Downloaded ds-cli.sh for DeepSource" ;
+	# Check if the response is valid
+	if [[ "$response" == *"Not Found"* ]]; then
+		printf "::debug::%s\n" "Repository not found or no releases available."
+		EXIT_CODE=125
 	fi ;
 
-	for i in 1 256 512 ; do
-		# test sha1/sha512 signatures if found and sha256 even if not found
-		if [[ ( -r ds-cli.sh.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
-			if [[ ${i} -eq 1 ]]; then
-				printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
-			fi
-			shasum -a $i -c --ignore-missing ds-cli.sh.sha${i} || EXIT_CODE=126
-			rm -vf ds-cli.sh.sha${i} 2>/dev/null ;
-		fi
-	done
-
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-		printf "::debug::%s\n" "Validated ds-cli.sh for DeepSource" ;
-		chmod -v 751 ./ds-cli.sh || EXIT_CODE=77
+		printf "::debug::%s\n" "Checking latest version for DeepSource" ;
+		# Try to extract the tag name using jq
+		if [[ ( -x "$(command -v jq)" ) ]]; then
+			tag_name=$(printf "%s\n" "$response" | jq -r '.tag_name')
+		else
+			# Fallback to grep and sed if jq is not available
+			tag_name=$(printf "%s\n" "$response" | grep -o '"tag_name": "[^"]*' | sed 's/"tag_name": "//')
+		fi ;
 	fi ;
-	
+
+	# Check if tag_name is empty
+	if [[ ( -z "$tag_name" ) ]]; then
+		printf "::debug::%s\n" "No tag name found in the response."
+		EXIT_CODE=125
+	else
+		printf "::debug::%s\n" "Found version ${tag_name} for DeepSource" ;
+		DS_TAG="${tag_name#v}"
+	fi ;
+
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		printf "::debug::%s\n" "Creating ${BINDIR} directory for DeepSource" ;
-		mkdir -v -m 755 "${BINDIR}" || EXIT_CODE=66
+		mkdir -m 755 "${BINDIR}" || EXIT_CODE=66 ;
+	fi ;
+
+	curl -fLso "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" "https://github.com/DeepSourceCorp/cli/releases/download/v${DS_TAG}/deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" || EXIT_CODE=125 ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::debug::%s\n" "Downloaded deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz for DeepSource" ;
+	fi ;
+	
+	curl -fLso "checksums.txt" "https://github.com/DeepSourceCorp/cli/releases/download/v${DS_TAG}/checksums.txt" || EXIT_CODE=125 ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::debug::%s\n" "Downloaded checksums.txt for DeepSource" ;
+	fi ;
+
+	if [[ ( -r checksums.txt ) ]] ; then
+		shasum -a 256 -c --ignore-missing checksums.txt || EXIT_CODE=126
+		rm -f checksums.txt 2>/dev/null ;
+	fi ;
+
+	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::debug::%s\n" "Validated deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz for DeepSource" ;
+		tar --no-same-owner -xzf "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" -C "${BINDIR}" || EXIT_CODE=77 ;
+		rm -f "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" 2>/dev/null || EXIT_CODE=77 ;
+		rm -fRd "${BINDIR}"/completions/ 2>/dev/null || : ;
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
-		printf "::group::%s\n" "Running ./ds-cli.sh" ;
-		time { cat ./ds-cli.sh | sh ;} ; wait ;
-		printf "::endgroup::\n" ;
+		#printf "::group::%s\n" "Running ./ds-cli.sh" ;
+		#{ cat ./ds-cli.sh | sh - | grep -o "(:?version).{1}\s[0-9].[0-9].[0-9]" ;} ; wait ;
+		#printf "::endgroup::\n" ;
 		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 			printf "::debug::%s\n" "Checking for DeepSource CLI" ;
 			if [[ ( -d "${BINDIR}" ) ]] ; then
@@ -304,4 +333,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-b444b5d3e9093ee01e78a8fe991e60d0f6d48218fbb13cf8d3e6d06705a4289a7def2fcfe44758328c76572633cfd4ad  -
+779f220ba3f753ed3e929121e0742fe6362d779be1dfff7dda258e04b4fb95412e740b5f4ad5319b8ca61c79151cd735  -

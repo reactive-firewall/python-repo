@@ -65,7 +65,7 @@
 
 
 # to check though:
-diff -q <(tail -n 269 "$0" | head -n 267 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
+diff -q <(tail -n 300 "$0" | head -n 298 | shasum -a 384 -t -) <(tail -n 1 "$0") || exit 70 ;
 
 ulimit -t 90
 PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
@@ -76,17 +76,42 @@ DS_TAG="0.8.6"  # circa 2025
 umask 127
 
 LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
-EXIT_CODE=0
+EXIT_CODE=1
+# Function to check if a command exists.
+ 
+# USAGE:
+#	~$ check_command CMD
+# Arguments:
+# CMD (Required) -- Name of the command to check
+# Results:
+#	exits 64 -- missing required argument
+#	exits 126 -- check complete and has failed, can not find given command.
+#	returns successful -- check complete and command found to be executable.
+function check_command() {
+	test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
+	local cmd="$1" ;
+	# shellcheck disable=SC2086
+	test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
+}  # end check_command()
+# propagate/export function to sub-shells
+export -f check_command
+ 
+# Set up CEP-5 shlock helper
+hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed to register shlock helper. CEP-5 locking will not work." >&2 ; exit 78 ; } ;
+check_command cat ;
+check_command chmod ;
+check_command curl ;
+check_command git ;
+check_command grep ;
+check_command gpg ;
+check_command mkdir ;
+check_command sed ;  # but will try jq first
+check_command shasum ;
+check_command shlock ;
+check_command tar ;
+check_command uname ;
 
-test -x "$(command -v grep)" || exit 126 ;
-test -x "$(command -v sed)" || exit 126 ;
-test -x "$(command -v curl)" || exit 126 ;
-test -x "$(command -v mkdir)" || exit 126 ;
-hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
-test -x "$(command -v shlock)" || exit 126 ;
-test -x "$(command -v gpgv)" || exit 126 ;
-test -x "$(command -v shasum)" || exit 126 ;
-test -x "$(command -v tar)" || exit 126 ;
+SCRIPT_FILE="tests/fetch-test-reporter"
 
 # Detect the operating system
 case "$( command uname -s )" in
@@ -140,24 +165,25 @@ function cleanup() {
 	unset CI_ENV_PREFIX 2>/dev/null || :
 	unset CI_OS 2>/dev/null || :
 	unset ARCH 2>/dev/null || :
+	unset DS_TAG 2>/dev/null || :
 	hash -d shlock 2>/dev/null > /dev/null || : ;
 }
 
 if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
-		# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
-		#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || : ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
-		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
-		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+	EXIT_CODE=0
+	trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
+	trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
+	trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
+	# SC2173 - https://github.com/koalaman/shellcheck/wiki/SC2173
+	#trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 1 ;' SIGSTOP || EXIT_CODE=7
+	trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
+	trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
+	trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || : ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
+	trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		# shellcheck disable=SC2046
-		printf "\t%s\n" "CodeClimate already in progress by "$(head "${LOCK_FILE}") >&2 ;
-		false ;
-		exit 126 ;
+	# shellcheck disable=SC2046
+	printf "\t%s\n" "Fetch Tool already in progress by "$(head "${LOCK_FILE}") >&2 ;
+	exit 126 ;
 fi
 
 # this is how test files are found:
@@ -187,7 +213,7 @@ fi
 #########################
 # actual Work starts here
 #########################
-curl -fLso ./test-reporter-latest-${CI_ENV_PREFIX} https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX} ;
+curl -fLso ./test-reporter-latest-${CI_ENV_PREFIX} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX}" ;
 for i in 1 256 512 ; do
 	curl -fLso test-reporter-latest-${CI_ENV_PREFIX}.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX}.sha${i}" ; wait ;
 	curl -fLso test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig" ; wait ;
@@ -196,7 +222,7 @@ for i in 1 256 512 ; do
 		if [[ ${i} -eq 1 ]]; then
 			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
 		fi
-		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-${ARCH:-amd64}.sha${i}.sig ) ]] ; then
+		if [[ ( -r test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig ) ]] ; then
 			# configure your CI evironment to trust the key at gpg --keyserver  keys.openpgp.org --recv-keys 9BD9E2DD46DA965A537E5B0A5CBF320243B6FD85
 			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
 			# OR...
@@ -204,7 +230,7 @@ for i in 1 256 512 ; do
 			gpg --verify test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig test-reporter-latest-${CI_ENV_PREFIX}.sha${i} || ${CI} 2>/dev/null || ${CIRCLECI} 2>/dev/null || EXIT_CODE=126
 			rm -vf test-reporter-latest-${CI_ENV_PREFIX}.sha${i}.sig 2>/dev/null ;
 		fi
-		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_ENV_PREFIX}.sha${i} || EXIT_CODE=126
+		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_ENV_PREFIX}.sha${i} || EXIT_CODE=89
 		rm -vf test-reporter-latest-${CI_ENV_PREFIX}.sha${i} 2>/dev/null ;
 	fi
 done
@@ -215,7 +241,8 @@ if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 fi
 
 if [[ -z ${DEEPSOURCE_DSN} ]] && [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	printf "%s\n" "No need for Unconfigured DeepSource." ;
+	printf "::notice %s::%s\n" "file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=SKIP" \
+		"No need for Unconfigured DeepSource." ;
 elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 	printf "%s\n" "Detected Config for DeepSource" ;
 
@@ -224,8 +251,9 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	# Check if the response is valid
 	if [[ "$response" == *"Not Found"* ]]; then
-		printf "::debug::%s\n" "Repository not found or no releases available."
-		EXIT_CODE=125
+		printf "::warning %s::%s\n" "file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}" \
+		"Repository not found or no releases available." >&2 ;
+		EXIT_CODE=69
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
@@ -241,8 +269,9 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	# Check if tag_name is empty
 	if [[ ( -z "$tag_name" ) ]]; then
-		printf "::debug::%s\n" "No tag name found in the response."
-		EXIT_CODE=125
+		printf "::warning %s::%s\n" "file=${SCRIPT_FILE},line=${BASH_LINENO:-0},title=${FUNCNAME:-$0}" \
+		"No tag name found in the response." >&2 ;
+		EXIT_CODE=65
 	else
 		printf "::debug::%s\n" "Found version ${tag_name} for DeepSource" ;
 		DS_TAG="${tag_name#v}"
@@ -250,7 +279,7 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		printf "::debug::%s\n" "Creating ${BINDIR} directory for DeepSource" ;
-		mkdir -m 755 "${BINDIR}" || EXIT_CODE=66 ;
+		mkdir -v -m 755 "${BINDIR}" || EXIT_CODE=66 ;
 	fi ;
 
 	curl -fLso "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" "https://github.com/DeepSourceCorp/cli/releases/download/v${DS_TAG}/deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" || EXIT_CODE=125 ;
@@ -263,25 +292,29 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		printf "::debug::%s\n" "Downloaded checksums.txt for DeepSource" ;
+		if [[ ( -r checksums.txt ) ]] ; then
+			shasum -a 256 -c --ignore-missing checksums.txt || EXIT_CODE=89
+			rm -vf checksums.txt 2>/dev/null || : ;
+		fi ;
+		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+			printf "%s\n" "Validated deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz for DeepSource" ;
+		fi ;
 	fi ;
-
-	if [[ ( -r checksums.txt ) ]] ; then
-		shasum -a 256 -c --ignore-missing checksums.txt || EXIT_CODE=126
-		rm -f checksums.txt 2>/dev/null ;
-	fi ;
+	
+	printf "::group::%s\n" "Extracting deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-		printf "::debug::%s\n" "Validated deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz for DeepSource" ;
-		tar --no-same-owner -xzf "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" -C "${BINDIR}" 2>/dev/null || : ;
-		rm -f "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" 2>/dev/null || EXIT_CODE=77 ;
-		rm -fRd "${BINDIR}"/completions/ 2>/dev/null || : ;
+		tar --no-same-owner -xzf "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" -C "${BINDIR}" || : ;
+		rm -vf "deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" 2>/dev/null || : ;
+		rm -vfRd "${BINDIR}"/completions/ 2>/dev/null || : ;
+		printf "::debug::%s\n" "Extracted deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" ;
 	fi ;
+
+	printf "::endgroup::\n" ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 		# ref: https://docs.deepsource.com/docs/analyzers-test-coverage#setup-test-coverage
 		printf "::debug::%s\n" "Extracted deepsource_${DS_TAG}_${CI_OS}_${ARCH}.tar.gz" ;
-		#{ cat ./ds-cli.sh | sh - | grep -o "(:?version).{1}\s[0-9].[0-9].[0-9]" ;} ; wait ;
-		#printf "::endgroup::\n" ;
 		if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 			printf "::debug::%s\n" "Checking for DeepSource CLI" ;
 			if [[ ( -d "${BINDIR}" ) ]] ; then
@@ -301,21 +334,19 @@ elif [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
 				else
 					printf "::debug::..=> %s\n" "Missing ${BINDIR}/deepsource CLI tool" ;
 					EXIT_CODE=66 ;
-					printf "::debug::..=> %s\n" "Checking if ${BINDIR} is empty:" ;
-					readonly BIN_FILES=$( ls -1 "${BINDIR}" 2>/dev/null ;)
-					printf "::debug::..=> %s\n" "${BIN_FILES}" ;
-					unset $BIN_FILES 2>/dev/null || : ;
 				fi ;
 			else
 				printf "::debug::=> %s\n" "Missing ${BINDIR} directory." ;
-				EXIT_CODE=125 ;
+				EXIT_CODE=66 ;
 			fi ;
 		fi ;
 	fi ;
 
 	if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
+		printf "::group::%s\n" "Checking DeepSource Config" ;
 		# ref: https://docs.deepsource.com/docs/cli#commands
-		./bin/deepsource config validate || EXIT_CODE=$? ;
+		./bin/deepsource config validate || ${CI} 2>/dev/null || ${CIRCLECI} 2>/dev/null || EXIT_CODE=125 ;
+		printf "::endgroup::\n" ;
 	fi ;
 	wait ;
 fi ;
@@ -333,4 +364,4 @@ cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || : ; wait 
 exit ${EXIT_CODE:-255} ;
 
 # This file's code hash:
-f606b901a37e190d4d0a3e3f6945dda08598de00f182e212a3805c05e6110d5cde47fa492b549add4446124c14ed45f4  -
+64775bab23e56bbd695b87b099c23978d789791c79e94ae7c5cd126a99ca7fde949260d9ad26297027db34af2022f436  -

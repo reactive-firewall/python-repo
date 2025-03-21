@@ -199,7 +199,7 @@ jobs:
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
-      run: ./tests/fetch_cc-test-reporter || true ;
+      run: ./tests/fetch-test-reporter || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
       if: ${{ runner.python-version == '3.9' }}
       run: make -f Makefile test ;
@@ -304,7 +304,7 @@ jobs:
         pip install -r ./test-requirements.txt || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
-      run: if [ $OS == macos-latest ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
+      run: if [ $OS == macos-latest ] ; then ./tests/fetch-test-reporter || true ; fi ;
       shell: bash
     - name: Pre-Clean
       id: clean-prep

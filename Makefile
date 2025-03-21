@@ -92,7 +92,7 @@ else
 endif
 
 ifndef CC_TOOL
-	FETCH_CC_TOOL := tests/fetch_cc-test-reporter
+	FETCH_CC_TOOL := tests/fetch-test-reporter
 	CC_TOOL := ./cc-test-reporter
 	CC_TOOL_ARGS := after-build --exit-code 0 -t coverage.py
 	DS_TOOL := ./bin/deepsource
@@ -260,7 +260,7 @@ test-style: cleanup
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-cc-test-reporter: tests/fetch_cc-test-reporter
+cc-test-reporter: tests/fetch-test-reporter
 	$(QUIET)$(FETCH_CC_TOOL) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;

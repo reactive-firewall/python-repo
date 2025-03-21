@@ -130,7 +130,7 @@ else
 	EXIT_CODE=40
 fi
 
-_TEST_YEAR=$(date -j "+%C%y" 2>/dev/null ;)
+_TEST_YEAR=$(date "+%Y" 2>/dev/null || date -j "+%C%y" 2>/dev/null ;)
 
 for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 2>&1 | xargs -0 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
 	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then

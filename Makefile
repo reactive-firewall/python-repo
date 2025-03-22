@@ -181,7 +181,7 @@ MANIFEST.in: init
 
 build: init ./setup.py MANIFEST.in
 	$(QUIET)$(PYTHON) -W ignore -m build --sdist --wheel --no-isolation ./ || $(QUIET)$(PYTHON) -W ignore -m build ./ ;
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "build DONE."
 
 init:
@@ -203,7 +203,7 @@ user-install: build
 
 uninstall:
 	$(QUIET)$(PYTHON) -m pip uninstall --use-pep517 $(PIP_ENV_FLAGS) --no-input -y pythonrepo 2>$(ERROR_LOG_PATH) || :
-	$(QUITE)$(WAIT)
+	$(QUIET)$(WAIT)
 	$(QUIET)$(ECHO) "$@: Done."
 
 legacy-purge: clean uninstall

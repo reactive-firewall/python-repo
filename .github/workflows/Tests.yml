@@ -4,6 +4,8 @@ on:
     branches:
       - master
       - stable
+      - patch*
+      - feature*
     tags:
       - v*
   pull_request:
@@ -11,7 +13,6 @@ on:
       - opened
       - edited
       - reopened
-      - synchronize
       - ready_for_review
 
 # Declare default permissions as read only.
@@ -134,7 +135,7 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: ["3.9.20", "3.10", "3.11", "3.12"]
+        python-version: ["3.9.21", "3.10", "3.11", "3.12"]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
@@ -213,10 +214,10 @@ jobs:
       shell: bash
       run: ./tests/fetch-test-reporter || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
-      if: ${{ runner.python-version == '3.9' }}
+      if: ${{ matrix.python-version == '3.9' }}
       run: make -f Makefile test ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ runner.python-version != '3.9' }}
+      if: ${{ matrix.python-version != '3.9' }}
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v5
@@ -238,7 +239,7 @@ jobs:
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+        ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: deepsource for ${{ matrix.python-version }}
       if: ${{ runner.os }} == "Linux"
       shell: bash

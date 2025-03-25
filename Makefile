@@ -30,14 +30,17 @@ ifeq "$(ERROR_LOG_PATH)" ""
 endif
 
 ifeq "$(COMMAND)" ""
-	COMMAND_CMD!=`command -v xcrun || command which which || command -v which || command -v command`
+	COMMAND_CMD!=`command -v xcrun || command -v command || command which which || command -v which`
 	ifeq "$(COMMAND_CMD)" "*xcrun"
-		COMMAND_ARGS=--find
+		COMMAND_ARGS= --find
 	endif
 	ifeq "$(COMMAND_CMD)" "*command"
-		COMMAND_ARGS=-pv
+		COMMAND_ARGS= -pv
 	endif
-	COMMAND=$(COMMAND_CMD) $(COMMAND_ARGS)
+	ifeq "$(COMMAND_CMD)" ""
+		COMMAND_CMD="command"
+	endif
+	COMMAND := $(COMMAND_CMD)$(COMMAND_ARGS)
 endif
 
 ifeq "$(MAKE)" ""
@@ -62,41 +65,39 @@ else
 endif
 
 ifeq "$(LINK)" ""
-	LINK=ln -sf
+	LINK=$(COMMAND) ln -sf
 endif
 
+# Python command configuration
 ifeq "$(PYTHON)" ""
+	# Try to find python3, fallback to python
 	PY_CMD=$(COMMAND) python3
 	ifneq "$(PY_CMD)" ""
+		# Only use -B arg with python3
 		PY_ARGS=-B
 	else
 		PY_CMD=$(COMMAND) python
 	endif
-	PYTHON=$(PY_CMD) $(PY_ARGS)
-	ifeq "$(COVERAGE)" ""
-		COVERAGE=$(PYTHON) -m coverage
-		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
-		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
-		COV_CORE_DATAFILE = .coverage
-	endif
-	ifeq "$(COVERAGE)" ""
-		COVERAGE!=$(COMMAND) coverage
-	endif
-else
-	ifeq "$(COVERAGE)" ""
-		COVERAGE!=$(COMMAND) coverage
-		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
-		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
-		COV_CORE_DATAFILE = .coverage
-	endif
+	# Set PYTHON only if not already set
+	PYTHON := $(PY_CMD) $(PY_ARGS)
 endif
 
-ifndef CC_TOOL
-	FETCH_CC_TOOL := tests/fetch-test-reporter
-	CC_TOOL := ./cc-test-reporter
-	CC_TOOL_ARGS := after-build --exit-code 0 -t coverage.py
-	DS_TOOL := ./bin/deepsource
-	DS_TOOL_ARGS := report --analyzer test-coverage --key python --value-file ./coverage.xml
+# Coverage configuration
+ifeq "$(COVERAGE)" ""
+	# If PYTHON is set (either by us or externally), try module approach first
+	ifneq "$(PYTHON)" ""
+		COVERAGE=$(PYTHON) -m coverage
+	endif
+	# If COVERAGE is still not set, fall back to direct command
+	ifeq "$(COVERAGE)" ""
+		COVERAGE!=$(COMMAND) coverage
+	endif
+	# Only set COV_CORE_* variables when COVERAGE is configured
+	ifneq "$(COVERAGE)" ""
+		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
+		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
+		COV_CORE_DATAFILE = .coverage
+	endif
 endif
 
 ifndef PIP_COMMON_FLAGS
@@ -157,6 +158,26 @@ include $(FETCH_CC_INCLUDE_PATH)
 
 .PHONY: all clean test cleanup init help clean-docs must_be_root must_have_flake must_have_pytest uninstall cleanup-dev-backups
 
+.env:
+	$(QUIET)$(ECHO) "Missing environment override."
+	$(QUIET)$(ECHO) "  SHELL: '$(SHELL)'"
+	$(QUIET)$(ECHO) "  LOG: '$(LOG)'"
+	$(QUIET)$(ECHO) "  ERROR_LOG_PATH: '$(ERROR_LOG_PATH)'"
+	$(QUIET)$(ECHO) "  QUIET: '$(QUIET)'"
+	$(QUIET)$(ECHO) "  COMMAND: '$(COMMAND)'"
+	$(QUIET)$(ECHO) "  MAKE: '$(MAKE)'"
+	$(QUIET)$(ECHO) "  ECHO: '$(ECHO)'"
+	$(QUIET)$(ECHO) "  PYTHON: '$(PYTHON)'"
+	$(QUIET)$(ECHO) "  COVERAGE: '$(COVERAGE)'"
+	$(QUIET)$(ECHO) "  FETCH_CC_INCLUDE_PATH: '$(FETCH_CC_INCLUDE_PATH)'"
+	$(QUIET)$(ECHO) "  CC_TOOL: '$(CC_TOOL)'"
+	$(QUIET)$(ECHO) "  DS_TOOL: '$(DS_TOOL)'"
+	$(QUIET)$(ECHO) "  CC_TOOL_ARGS: '$(CC_TOOL_ARGS)'"
+	$(QUIET)$(ECHO) "  DS_TOOL_ARGS: '$(DS_TOOL_ARGS)'"
+	$(QUIET)$(ECHO) "  PIP_ENV_FLAGS: '$(PIP_ENV_FLAGS)'"
+	$(QUIET)$(ECHO) "  PIP_COMMON_FLAGS: '$(PIP_COMMON_FLAGS)'"
+	$(QUIET)$(ECHO) "  DO_FAIL: '$(DO_FAIL)'"
+	$(QUIET)$(ECHO) ""  # intentionally blank
 
 MANIFEST.in: init
 	$(QUIET)$(ECHO) "include requirements.txt" >"$@" ;
@@ -222,15 +243,15 @@ purge: legacy-purge
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || :
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-reports:
+test-reports: .env
 	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(BSMARK) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reqs: cc-test-reporter test-reports init
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests/requirements.txt 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests-requirements.txt 2>$(ERROR_LOG_PATH) || true
 
-just-test: cleanup
+just-test: cleanup .env
 	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;

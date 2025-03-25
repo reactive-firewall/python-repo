@@ -107,15 +107,8 @@ endif
 # Define environment-specific flags
 ifeq ($(shell uname -s), Darwin)
 	PIP_ENV_FLAGS := --break-system-packages
-else ifeq ($(shell uname -s), Linux)
-	PIP_ENV_FLAGS :=
 else
 	PIP_ENV_FLAGS :=
-	FETCH_CC_TOOL := :
-	CC_TOOL := :
-	CC_TOOL_ARGS :=
-	DS_TOOL := :
-	DS_TOOL_ARGS :=
 endif
 
 ifeq "$(WAIT)" ""
@@ -154,6 +147,8 @@ endif
 ifeq "$(RMDIR)" ""
 	RMDIR=$(RM)Rd
 endif
+
+include includes/fetch-test-reporter/tools-fetch-test-reporter.make
 
 .PHONY: all clean test cleanup init help clean-docs must_be_root must_have_flake must_have_pytest uninstall cleanup-dev-backups
 
@@ -260,7 +255,7 @@ test-style: cleanup
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-cc-test-reporter: tests/fetch-test-reporter
+cc-test-reporter: $(FETCH_CC_TOOL)
 	$(QUIET)$(FETCH_CC_TOOL) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;

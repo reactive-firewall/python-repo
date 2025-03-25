@@ -107,11 +107,11 @@ endif
 # Define environment-specific flags
 ifeq ($(shell uname -s), Darwin)
 	PIP_ENV_FLAGS := --break-system-packages
-	INCLUDE_PATH = includes/fetch-test-reporter/tools-fetch-test-reporter.make
+	FETCH_CC_INCLUDE_PATH := includes/fetch-test-reporter/tools-fetch-test-reporter.make
 else ifeq ($(shell uname -s), Linux)
-	INCLUDE_PATH = includes/fetch-test-reporter/tools-fetch-test-reporter.make
+	FETCH_CC_INCLUDE_PATH := includes/fetch-test-reporter/tools-fetch-test-reporter.make
 else
-	INCLUDE_PATH = includes\fetch-test-reporter\tools-fetch-test-reporter.make
+	FETCH_CC_INCLUDE_PATH := includes\fetch-test-reporter\tools-fetch-test-reporter.make
 	PIP_ENV_FLAGS :=
 endif
 
@@ -153,7 +153,7 @@ ifeq "$(RMDIR)" ""
 endif
 
 # Include the makefile
-include $(INCLUDE_PATH)
+include $(FETCH_CC_INCLUDE_PATH)
 
 .PHONY: all clean test cleanup init help clean-docs must_be_root must_have_flake must_have_pytest uninstall cleanup-dev-backups
 
@@ -260,7 +260,7 @@ test-style: cleanup
 	$(QUIET)tests/check_spelling 2>/dev/null || true
 	$(QUIET)$(ECHO) "$@: Done."
 
-cc-test-reporter: $(FETCH_CC_TOOL)
+cc-test-reporter: $(FETCH_CC_INCLUDE_PATH)
 	$(QUIET)$(FETCH_CC_TOOL) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;

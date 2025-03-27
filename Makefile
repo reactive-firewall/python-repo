@@ -252,12 +252,12 @@ test-reports: .env
 test-reqs: cc-test-reporter test-reports init
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests-requirements.txt 2>$(ERROR_LOG_PATH) || true
 
-just-test: cleanup .env
+just-test: cleanup cc-test-reporter .env
 	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
-test: just-test cc-test-reporter
+test: just-test
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
@@ -270,8 +270,9 @@ test-tox: cleanup
 
 test-pytest: cleanup MANIFEST.in cc-test-reporter must_have_pytest test-reports
 	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
-	$(QUIET)$(DS_TOOL) $(DS_TOOL_ARGS) || : ;
 	$(QUIET)$(CC_TOOL) $(CC_TOOL_ARGS) 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(CA_TOOL) $(CA_TOOL_ARGS) || : ;
+	$(QUIET)$(DS_TOOL) $(DS_TOOL_ARGS) || : ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(ECHO) "$@: Done."
@@ -295,6 +296,9 @@ must_have_flake:
 must_have_pytest: init
 	$(QUIET)runner=`$(PYTHON) -m pip freeze --all | grep --count -oF pytest` ; \
 	if test $$runner -le 0 ; then $(ECHO) "No python framework (pytest) found for test." ; exit 126 ; fi
+
+cleanup-cc-test-reporter: $(FETCH_CC_INCLUDE_PATH)
+	$(QUIET)$(CLEAN_CC_TOOL) || :
 
 cleanup-dev-backups::
 	$(QUIET)$(RM) ./*/*~ 2>$(ERROR_LOG_PATH) || :
@@ -382,8 +386,7 @@ clean-docs: ./docs/ ./docs/Makefile
 ./docs/Makefile: ./docs/
 	$(QUIET)$(WAIT) ;
 
-clean: clean-docs cleanup
-	$(QUIET)$(ECHO) "Cleaning Up."
+clean: clean-docs cleanup cleanup-cc-test-reporter
 	$(QUIET)$(COVERAGE) erase 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./test-results/junit.xml 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./MANIFEST.in 2>$(ERROR_LOG_PATH) || true

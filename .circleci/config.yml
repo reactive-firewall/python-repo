@@ -120,7 +120,7 @@ jobs:
           when: on_success
       - run:
           shell: /bin/bash
-          name: "clean up for test"
+          name: "install test-reqs attempt"
           command: |
             python3 -m pip install --upgrade --user -r ./test-requirements.txt || : ;
           when: on_success

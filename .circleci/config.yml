@@ -15,14 +15,8 @@ commands:
           shell: /bin/bash
           name: "Fetch"
           command: |
-            git fetch --verbose --all ;
+            git fetch --all ;
           when: always
-      - run:
-          shell: /bin/bash
-          name: "Pull"
-          command: |
-            git pull --all ;
-          when: on_success
       - run:
           shell: /bin/bash
           name: "Sync Submodules"

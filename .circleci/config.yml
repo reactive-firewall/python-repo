@@ -9,6 +9,32 @@ commands:
           command: |
             make clean
           when: always
+  reposync:
+    steps:
+      - run:
+          shell: /bin/bash
+          name: "Fetch"
+          command: |
+            git fetch ;
+          when: always
+      - run:
+          shell: /bin/bash
+          name: "Pull"
+          command: |
+            git pull --all ;
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "Sync Submodules"
+          command: |
+            git submodule sync ;
+          when: on_success
+      - run:
+          shell: /bin/bash
+          name: "Update Submodules"
+          command: |
+            git submodule update --init ;
+          when: on_success
 
 parameters:
   python-version:
@@ -29,10 +55,7 @@ jobs:
     working_directory: ~/python-repo
     steps:
       - checkout
-      - run:
-          name: "fetch and pull"
-          command: |
-            git fetch && git pull --all || : ;
+      - reposync
       - run:
           shell: /bin/bash
           name: "install depends attempt"

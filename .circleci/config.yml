@@ -15,7 +15,7 @@ commands:
           shell: /bin/bash
           name: "Fetch"
           command: |
-            git fetch ;
+            git fetch --unshallow --recurse-submodules=yes --all ;
           when: always
       - run:
           shell: /bin/bash

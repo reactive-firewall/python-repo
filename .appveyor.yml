@@ -9,22 +9,20 @@ image:
 - Visual Studio 2022
 - Visual Studio 2019
 clone_depth: 50
-init:
+install:
+  - cinst make
+  - cinst git
+  - cmd: >-
+      choco install python --pre || VER>NUL
+
+      choco upgrade python --pre || VER>NUL
+  - cmd: >-
+      python -m pip install flake8 || VER>NUL
+
+      python -m pip install coverage || VER>NUL
+  - cinst codecov
+before_build:
 - cmd: >-
-    choco install make || VER>NUL
-
-    choco install git || VER>NUL
-
-    choco install python --pre || VER>NUL
-
-    choco upgrade python --pre || VER>NUL
-
-    python -m pip install flake8 || VER>NUL
-
-    python -m pip install coverage || VER>NUL
-
-    choco install codecov || VER>NUL
-
     git submodule sync || VER>NUL
 
     git submodule update --init || VER>NUL

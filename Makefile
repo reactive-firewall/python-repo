@@ -77,8 +77,12 @@ endif
 
 # Python command configuration
 ifeq "$(PYTHON)" ""
-	# Try to find python3, fallback to python
-	PY_CMD=$(shell $(COMMAND) python3)
+	ifneq "$(PYTHON_VERSION)" ""
+		PY_CMD=$(shell $(COMMAND) python$(PYTHON_VERSION))
+	else
+		# Try to find python3, fallback to python
+		PY_CMD=$(shell $(COMMAND) python3)
+	endif
 	ifneq "$(PY_CMD)" ""
 		# Only use -B arg with python3
 		PY_ARGS=-B

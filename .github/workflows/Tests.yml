@@ -173,6 +173,9 @@ jobs:
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 10
     strategy:
       matrix:
@@ -202,9 +205,11 @@ jobs:
       if: ${{ !cancelled() && runner.os == 'Windows' }}
       run: python -m pip install --upgrade pip
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
+      shell: bash
       run: make -f Makefile test-reqs ;
     - name: Pre-Clean
       id: clean
+      shell: bash
       run: make -j1 -f Makefile clean || true ;
     - name: Install code-climate tools for ${{ matrix.python-version }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
@@ -212,9 +217,11 @@ jobs:
       run: ./tests/fetch-test-reporter || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
       if: ${{ matrix.python-version == '3.9' }}
+      shell: bash
       run: make -f Makefile test ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ matrix.python-version != '3.9' }}
+      shell: bash
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v5
@@ -244,6 +251,7 @@ jobs:
         ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Post-Clean
       id: post
+      shell: bash
       run: make -j1 -f Makefile clean || true ;
       if: ${{ !cancelled() }}
 
@@ -267,10 +275,8 @@ jobs:
       with:
         python-version: "3.12"
     - name: Install dependencies for python Linters
-      run: |
-        pip install --upgrade "pip>=24.3.1" "setuptools>=45.0" "wheel>=0.37" ;
-        pip install -r ./requirements.txt ;
-        pip install -r ./test-requirements.txt || true ;
+      shell: bash
+      run: make -f Makefile test-reqs || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -314,18 +320,18 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade "pip>=24.3.1" "setuptools>=45.0" "wheel>=0.37" ;
-        pip install -r ./requirements.txt ;
-        pip install -r ./test-requirements.txt || true ;
+      shell: bash
+      run: make -f Makefile test-reqs ;
     - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os != 'Windows' }}
       run: if [ $OS == macos-latest ] ; then ./tests/fetch-test-reporter || true ; fi ;
       shell: bash
     - name: Pre-Clean
       id: clean-prep
+      shell: bash
       run: make -j1 -f Makefile clean ;
     - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      shell: bash
       run: make -j1 -f Makefile build ;
       if: ${{ success() }}
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}

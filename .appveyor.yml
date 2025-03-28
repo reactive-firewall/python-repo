@@ -25,6 +25,10 @@ init:
 
     choco install codecov || VER>NUL
 
+    git submodule sync || VER>NUL
+
+    git submodule update --init || VER>NUL
+
     dir
 build_script:
 - cmd: make clean

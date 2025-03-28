@@ -102,7 +102,7 @@ ifeq "$(COVERAGE)" ""
 	# Only set COV_CORE_* variables when COVERAGE is configured
 	ifneq "$(COVERAGE)" ""
 		#COV_CORE_SOURCE = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/
-		COV_CORE_CONFIG = $(dir $(abspath $(lastword $(MAKEFILE_LIST))))/.coveragerc
+		COV_CORE_CONFIG = $(dir $(abspath $(firstword $(MAKEFILE_LIST)))).coveragerc
 		COV_CORE_DATAFILE = .coverage
 	endif
 endif
@@ -253,15 +253,15 @@ purge: legacy-purge
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports: .env
-	$(QUIET)mkdir $(INST_OPTS) $(dir $(abspath $(lastword $(MAKEFILE_LIST))))test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
-	$(QUIET)$(BSMARK) $(dir $(abspath $(lastword $(MAKEFILE_LIST))))test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)mkdir $(INST_OPTS) $(dir $(abspath $(firstword $(MAKEFILE_LIST))))test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)$(BSMARK) $(dir $(abspath $(firstword $(MAKEFILE_LIST))))test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reqs: .env init cc-test-reporter test-reports
 	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r test-requirements.txt 2>$(ERROR_LOG_PATH) || true
 
 just-test: cleanup
-	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s $(dir $(abspath $(lastword $(MAKEFILE_LIST))))tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s $(dir $(abspath $(lastword $(MAKEFILE_LIST))))tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || DO_FAIL="exit 2" ;
+	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s $(dir $(abspath $(firstword $(MAKEFILE_LIST))))tests -t $(dir $(abspath $(firstword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s $(dir $(abspath $(firstword $(MAKEFILE_LIST))))tests -t $(dir $(abspath $(firstword $(MAKEFILE_LIST)))) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
@@ -277,7 +277,7 @@ test-tox: cleanup
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-pytest: cleanup MANIFEST.in test-reqs must_have_pytest test-reports
-	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || DO_FAIL="exit 2" ;
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=$(dir $(abspath $(firstword $(MAKEFILE_LIST)))) || DO_FAIL="exit 2" ;
 	$(QUIET)$(CC_TOOL) $(CC_TOOL_ARGS) 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(CA_TOOL) $(CA_TOOL_ARGS) || : ;
 	$(QUIET)$(DS_TOOL) $(DS_TOOL_ARGS) || : ;

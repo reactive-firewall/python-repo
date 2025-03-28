@@ -10,8 +10,10 @@ image:
 - Visual Studio 2019
 clone_depth: 50
 install:
-  - cinst make
-  - cinst git
+  - cmd: >-
+      choco install make || VER>NUL
+  - cmd: >-
+      choco install git || VER>NUL
   - cmd: >-
       choco install python --pre || VER>NUL
 
@@ -20,7 +22,8 @@ install:
       python -m pip install flake8 || VER>NUL
 
       python -m pip install coverage || VER>NUL
-  - cinst codecov
+  - cmd: >-
+      choco install codecov || VER>NUL
 before_build:
 - cmd: >-
     git submodule sync || VER>NUL

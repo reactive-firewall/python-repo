@@ -30,17 +30,22 @@ ifeq "$(ERROR_LOG_PATH)" ""
 endif
 
 ifeq "$(COMMAND)" ""
-	COMMAND_CMD!=`command -v xcrun || command -v command || command which which || command -v which`
-	ifeq "$(COMMAND_CMD)" "*xcrun"
+	COMMAND_CMD=$(shell command -v xcrun || command -v command || command which which || command -v which)
+	COMMAND_TOOL=$(notdir $(COMMAND_CMD))
+	ifeq "$(COMMAND_TOOL)" "xcrun"
 		COMMAND_ARGS= --find
 	endif
-	ifeq "$(COMMAND_CMD)" "*command"
-		COMMAND_ARGS= -pv
+	ifeq "$(COMMAND_TOOL)" "command"
+		COMMAND_ARGS= -v
 	endif
 	ifeq "$(COMMAND_CMD)" ""
 		COMMAND_CMD="command"
 	endif
-	COMMAND := $(COMMAND_CMD)$(COMMAND_ARGS)
+	ifdef COMMAND_ARGS
+		COMMAND := $(COMMAND_CMD) $(COMMAND_ARGS)
+	else
+		COMMAND := $(COMMAND_CMD)
+	endif
 endif
 
 ifeq "$(MAKE)" ""
@@ -53,30 +58,32 @@ ifeq "$(ECHO)" ""
 	ECHO=printf "%s\n"
 endif
 
-ifdef "$(ACTION)"
-	SET_FILE_ATTR=$(COMMAND) xattr
+ifdef ACTION
+	SET_FILE_ATTR=$(shell $(COMMAND) xattr)
 endif
 
-ifdef "$(SET_FILE_ATTR)"
+ifdef SET_FILE_ATTR
 	CREATEDBYBUILDSYSTEM=-w com.apple.xcode.CreatedByBuildSystem true
 	BSMARK=$(SET_FILE_ATTR) $(CREATEDBYBUILDSYSTEM)
 else
-	BSMARK=$(COMMAND) touch -a
+	BSMARK_CMD=$(shell $(COMMAND) touch)
+	BSMARK=$(BSMARK_CMD) -a
 endif
 
 ifeq "$(LINK)" ""
-	LINK=$(COMMAND) ln -sf
+	LINK_CMD=$(shell $(COMMAND) ln)
+	LINK=$(LINK_CMD) -sf
 endif
 
 # Python command configuration
 ifeq "$(PYTHON)" ""
 	# Try to find python3, fallback to python
-	PY_CMD=$(COMMAND) python3
+	PY_CMD=$(shell $(COMMAND) python3)
 	ifneq "$(PY_CMD)" ""
 		# Only use -B arg with python3
 		PY_ARGS=-B
 	else
-		PY_CMD=$(COMMAND) python
+		PY_CMD=$(shell $(COMMAND) python)
 	endif
 	# Set PYTHON only if not already set
 	PYTHON := $(PY_CMD) $(PY_ARGS)
@@ -90,7 +97,7 @@ ifeq "$(COVERAGE)" ""
 	endif
 	# If COVERAGE is still not set, fall back to direct command
 	ifeq "$(COVERAGE)" ""
-		COVERAGE!=$(COMMAND) coverage
+		COVERAGE=$(shell $(COMMAND) coverage)
 	endif
 	# Only set COV_CORE_* variables when COVERAGE is configured
 	ifneq "$(COVERAGE)" ""
@@ -121,7 +128,7 @@ ifeq "$(WAIT)" ""
 endif
 
 ifeq "$(INSTALL)" ""
-	INSTALL=install
+	INSTALL=$(shell $(COMMAND) install)
 	ifeq "$(INST_OWN)" ""
 		INST_OWN=-o root -g staff
 	endif
@@ -142,11 +149,12 @@ ifeq "$(LOG)" "no"
 endif
 
 ifeq "$(DO_FAIL)" ""
-	DO_FAIL=$(COMMAND) :
+	DO_FAIL=$(shell $(COMMAND) : )
 endif
 
 ifeq "$(RM)" ""
-	RM=$(COMMAND) rm -f
+	RM_CMD=$(shell $(COMMAND) rm)
+	RM=$(RM_CMD) -f
 endif
 
 ifeq "$(RMDIR)" ""

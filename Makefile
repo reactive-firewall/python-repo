@@ -253,19 +253,19 @@ purge: legacy-purge
 	$(QUIET)$(ECHO) "$@: Done."
 
 test-reports: .env
-	$(QUIET)mkdir $(INST_OPTS) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
-	$(QUIET)$(BSMARK) ./test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)mkdir $(INST_OPTS) $(dir $(abspath $(lastword $(MAKEFILE_LIST))))test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
+	$(QUIET)$(BSMARK) $(dir $(abspath $(lastword $(MAKEFILE_LIST))))test-reports 2>$(ERROR_LOG_PATH) >$(ERROR_LOG_PATH) || true ;
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-reqs: cc-test-reporter test-reports init
-	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r tests-requirements.txt 2>$(ERROR_LOG_PATH) || true
+test-reqs: .env init cc-test-reporter test-reports
+	$(QUIET)$(PYTHON) -m pip install $(PIP_COMMON_FLAGS) $(PIP_ENV_FLAGS) -r test-requirements.txt 2>$(ERROR_LOG_PATH) || true
 
-just-test: cleanup cc-test-reporter .env
-	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s ./tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s ./tests -t ./ || DO_FAIL="exit 2" ;
+just-test: cleanup
+	$(QUIET)$(COVERAGE) run -p --source=pythonrepo -m unittest discover --verbose --buffer -s $(dir $(abspath $(lastword $(MAKEFILE_LIST))))tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || $(PYTHON) -m unittest discover --verbose --buffer -s $(dir $(abspath $(lastword $(MAKEFILE_LIST))))tests -t $(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || DO_FAIL="exit 2" ;
 	$(QUIET)$(WAIT) ;
 	$(QUIET)$(DO_FAIL) ;
 
-test: just-test
+test: test-reqs just-test
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
@@ -276,8 +276,8 @@ test-tox: cleanup
 	$(QUIET)tox -v -- || tail -n 500 .tox/py*/log/py*.log 2>/dev/null
 	$(QUIET)$(ECHO) "$@: Done."
 
-test-pytest: cleanup MANIFEST.in cc-test-reporter must_have_pytest test-reports
-	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=. || DO_FAIL="exit 2" ;
+test-pytest: cleanup MANIFEST.in test-reqs must_have_pytest test-reports
+	$(QUIET)$(PYTHON) -m pytest --cache-clear --doctest-glob=pythonrepo/*.py --doctest-modules --cov=. --cov-append --cov-report=xml --junitxml=test-reports/junit.xml -v --rootdir=$(dir $(abspath $(lastword $(MAKEFILE_LIST)))) || DO_FAIL="exit 2" ;
 	$(QUIET)$(CC_TOOL) $(CC_TOOL_ARGS) 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(CA_TOOL) $(CA_TOOL_ARGS) || : ;
 	$(QUIET)$(DS_TOOL) $(DS_TOOL_ARGS) || : ;

@@ -287,7 +287,7 @@ just-test: cleanup
 test: test-reqs just-test
 	$(QUIET)$(DO_FAIL) ;
 	$(QUIET)$(COVERAGE) combine 2>$(ERROR_LOG_PATH) || : ;
-	$(QUIET)$(COVERAGE) report -m --include=* 2>$(ERROR_LOG_PATH) || : ;
+	$(QUIET)$(COVERAGE) report -m --include=pythonrepo/* 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(CC_TOOL) $(CC_TOOL_ARGS) 2>$(ERROR_LOG_PATH) || : ;
 	$(QUIET)$(ECHO) "$@: Done."
 
@@ -384,6 +384,7 @@ cleanup-src-dir: cleanup-dev-backups cleanup-mac-dir-store
 cleanup: cleanup-tests cleanup-pythonrepo cleanup-pythonrepo-eggs cleanup-src-dir
 	$(QUIET)$(RM) ./.coverage 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./coverage*.xml 2>$(ERROR_LOG_PATH) || true
+	$(QUIET)$(RM) ./.coverage.* 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RM) ./sitecustomize.py 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(RMDIR) ./test-reports/ 2>$(ERROR_LOG_PATH) || true
 	$(QUIET)$(WAIT) ;

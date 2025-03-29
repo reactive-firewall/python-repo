@@ -2,10 +2,11 @@
 concurrency = multiprocessing
 parallel = True
 sigterm = True
-branch = True
+# enable if you want to consider branches in coverage
+# branch = True
 
 [report]
-include = pythonrepo/*,tests/*
+include = pythonrepo/*
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma
@@ -45,3 +46,11 @@ partial_branches =
     if __name__ in u'__main__':
     if __name__ in u"__main__":
     if __name__ in '__main__':
+    if __sys_path__ not in sys.path:
+    # don't complain about sys.modules
+    sys.modules
+    not in sys.modules:
+    if context.__name__ is None:
+    if 'os' not in sys.modules:
+    if 'os.path' not in sys.modules:
+    if 'argparse' not in sys.modules:

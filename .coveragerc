@@ -2,11 +2,10 @@
 concurrency = multiprocessing
 parallel = True
 sigterm = True
-# enable if you want to consider branches in coverage
-# branch = True
+branch = True
 
 [report]
-include = pythonrepo/*,tests*
+include = pythonrepo/*,tests/*
 # Regexes for lines to exclude from consideration
 exclude_lines =
     # Have to re-enable the standard pragma

@@ -208,10 +208,17 @@ jobs:
       if: ${{ !cancelled() && runner.os == 'Windows' }}
       run: |
         echo "C:\Program Files\Git\usr\bin" >> $env:GITHUB_PATH
-    - name: VERIFY Git Unix tools in PATH for braindead windows ${{ matrix.os }}
+    - name: VERIFY that PATH resolution works somehow for braindead windows on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Windows' }}
       run: |
-        command -v touch
+        command -v touch ;
+        command -v python ;
+        command -v python3 ;
+        command -v make ;
+        where touch ;
+        where python ;
+        where python3 ;
+        where make ;
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       shell: bash
       run: make -f Makefile test-reqs ;

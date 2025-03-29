@@ -204,6 +204,10 @@ jobs:
     - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
       if: ${{ !cancelled() && runner.os == 'Windows' }}
       run: python -m pip install --upgrade pip
+    - name: Add Git Unix tools to PATH for braindead windows ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os == 'Windows' }}
+      run: |
+        echo "C:\Program Files\Git\usr\bin" >> $env:GITHUB_PATH
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
       shell: bash
       run: make -f Makefile test-reqs ;

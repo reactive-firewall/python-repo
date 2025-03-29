@@ -48,6 +48,12 @@ ifeq "$(COMMAND)" ""
 	endif
 endif
 
+# Check if POSIX touch command can be resolved by COMMAND in the runtime env
+ifeq "$(notdir $(shell $(COMMAND) touch))" ""
+	# This is a non-POSIX environment, so try Windows fallback
+	COMMAND := where
+endif
+
 ifeq "$(MAKE)" ""
 	#  just no cmake please
 	MAKEFLAGS=$(MAKEFLAGS) -s
@@ -72,7 +78,11 @@ endif
 
 ifeq "$(LINK)" ""
 	LINK_CMD=$(shell $(COMMAND) ln)
-	LINK=$(LINK_CMD) -sf
+	ifneq "$(LINK_CMD)" ""
+		LINK=$(LINK_CMD) -sf
+	else
+		LINK=$(ECHO) "::debug:: Linking is not supported for file: "
+	endif
 endif
 
 # Python command configuration
@@ -90,7 +100,11 @@ ifeq "$(PYTHON)" ""
 		PY_CMD=$(shell $(COMMAND) python)
 	endif
 	# Set PYTHON only if not already set
-	PYTHON := $(PY_CMD) $(PY_ARGS)
+	ifdef PY_ARGS
+		PYTHON := $(PY_CMD) $(PY_ARGS)
+	else
+		PYTHON := $(PY_CMD)
+	endif
 endif
 
 # Coverage configuration

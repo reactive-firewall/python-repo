@@ -50,7 +50,7 @@ endif
 
 # Check if POSIX touch command can be resolved by COMMAND in the runtime env
 ifeq "$(notdir $(shell $(COMMAND) touch))" ""
-	# This is a non-POSIX environment, so try Windows fallback logic
+	# This is a non-POSIX environment, so try GHA-Windows-Latest Specific fallback logic
 	COMMAND="which"
 endif
 

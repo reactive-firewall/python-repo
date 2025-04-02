@@ -128,7 +128,7 @@ try:
 		str("""Topic :: Software Development :: Libraries :: Python Modules""")
 	]
 except Exception:
-	class_tags = str("""Development Status :: 4 - Beta""")
+	class_tags = [str("""Development Status :: 4 - Beta""")]
 
 setup(
 	name=conf_dict["""metadata"""]["""name"""],

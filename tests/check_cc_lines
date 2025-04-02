@@ -60,37 +60,49 @@
 #    even if the above stated remedy fails of its essential purpose.
 ################################################################################
 
-ulimit -t 1200
-PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin:${PATH}"
-LANG=${LANG:-"en_US"}
-LC_ALL="${LANG:1:5}.utf-8"
-umask 127
+ulimit -t 600
+PATH="/bin:/sbin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin"
+umask 137
 
-LOCK_FILE="${TMPDIR:-/tmp}/org.pak.tests.scripts.code-climate.lock"
-EXIT_CODE=0
+LOCK_FILE="${TMPDIR:-/tmp}/cc_line_test_script_lock"
+EXIT_CODE=1
 
-test -x "$(command -v grep)" || exit 126 ;
-test -x "$(command -v curl)" || exit 126 ;
-hash -p ./.github/tool_shlock_helper.sh shlock || exit 255 ;
-test -x "$(command -v shlock)" || exit 126 ;
-test -x "$(command -v gpgv)" || exit 126 ;
-test -x "$(command -v shasum)" || exit 126 ;
+# Function to check if a command exists.
 
-# sorry no windows support here
-if [[ $( command uname -s ) == *arwin ]] ; then
-	CI_OS="darwin"
-else
-	CI_OS="linux"
-fi
+# USAGE:
+#  ~$ check_command CMD
+# Arguments:
+# CMD (Required) -- Name of the command to check
+# Results:
+#    exits 64 -- missing required argument
+#    exits 126 -- check complete and has failed, can not find given command.
+#    returns successful -- check complete and command found to be executable.
+function check_command() {
+    test -z "$1" && { printf "%s\n" "Error: command name is required to check for existence." >&2 ; exit 64 ; } ;
+    local cmd="$1" ;
+    test -x "$(command -v ${cmd})" || { printf "%s\n" "Error: Required command '$cmd' is not found." >&2 ; exit 126 ; } ;
+}  # end check_command()
+# propagate/export function to sub-shells
+export -f check_command
+
+# Set up CEP-5 shlock helper
+hash -p ./.github/tool_shlock_helper.sh shlock || { printf "%s\n" "Error: Failed to register shlock helper. CEP-5 locking will not work." >&2 ; exit 78 ; } ;
+
+# Check required commands
+check_command grep ;
+check_command curl ;
+check_command find ;
+check_command git ;
+check_command shlock ;
+
 
 function cleanup() {
-	rm -f "${LOCK_FILE}" 2>/dev/null || true ; wait ;
-	rm -f ./test-reporter-latest-*-amd64.SHA*.sig 2>/dev/null || true ; wait ;
-	rm -f ./test-reporter-latest-*-amd64.SHA* 2>/dev/null > /dev/null || true ; wait ;
+	rm -f ${LOCK_FILE} 2>/dev/null || true ; wait ;
 	hash -d shlock 2>/dev/null > /dev/null || true ;
 }
 
-if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
+if [[ ( $(shlock -f ${LOCK_FILE} -p $$ ) -eq 0 ) ]] ; then
+		EXIT_CODE=0
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 129 ;' SIGHUP || EXIT_CODE=129
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 143 ;' SIGTERM || EXIT_CODE=143
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 131 ;' SIGQUIT || EXIT_CODE=131
@@ -99,73 +111,56 @@ if [[ ( $(shlock -f "${LOCK_FILE}" -p $$ ) -eq 0 ) ]] ; then
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit 130 ;' SIGINT || EXIT_CODE=130
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true || true ; wait ; exit 137 ;' SIGABRT || EXIT_CODE=137
 		trap 'cleanup 2>/dev/null || rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
-		trap 'cleanup ; wait ; exit ${EXIT_CODE} ;' EXIT || EXIT_CODE=1
 else
-		# shellcheck disable=SC2046
-		printf "\t%s\n" "CodeClimate already in progress by "$(head "${LOCK_FILE}") >&2 ;
+		printf "%s\n" "Check for Copyright lines already in progress by "`head ${LOCK_FILE}` ;
 		false ;
 		exit 126 ;
 fi
 
 # this is how test files are found:
+_TEST_FILE_VALIDATOR="echo "
 
-# THIS IS THE ACTUAL TEST DIR USED (update _TEST_ROOT_DIR as needed)
-_TEST_ROOT_DIR="./" ;
-if [[ -d ./.git ]] ; then
-	_TEST_ROOT_DIR="./" ;
-elif [[ -d ./tests ]] ; then
-	_TEST_ROOT_DIR="./" ;
+# THIS IS THE ACTUAL TEST
+if _TEST_ROOT_DIR=$(git rev-parse --show-superproject-working-tree 2>/dev/null); then
+	if [ -z "${_TEST_ROOT_DIR}" ]; then
+		_TEST_ROOT_DIR=$(git rev-parse --show-toplevel 2>/dev/null)
+	fi
 else
-	printf "%s\n" "FAIL: missing valid folder or file"
-	EXIT_CODE=1
+	printf "\t%s\n" "FAIL: missing valid repository or source structure" >&2
+	EXIT_CODE=40
 fi
 
-# This File  MUST BE GIT-IGNORED
-# to be SAFELY USED to store Tokens and env vars (update logic as needed)
-if [[ ( -r ./codecov_env ) ]] ; then
-	# shellcheck disable=SC2086,SC1091
-	source ./codecov_env 2>/dev/null || true ;
-fi
+_TEST_YEAR=$(date "+%Y" 2>/dev/null || date -j "+%C%y" 2>/dev/null ;)
 
-
-#########################
-# actual Work starts here
-#########################
-curl -fLso ./test-reporter-latest-${CI_OS:-linux}-amd64 https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64 ;
-for i in 1 256 512 ; do
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}" ; wait ;
-	curl -fLso test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig "https://codeclimate.com/downloads/test-reporter/test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig" ; wait ;
-	# test sha1/sha512 signatures if found and sha256 even if not found
-	if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} ) ]] || [[ ( ${i} -eq 256 ) ]] ; then
-		if [[ ${i} -eq 1 ]]; then
-			printf "%s\n" "WARNING: SHA-1 is deprecated and should be avoided when possible. Consider using SHA-256 or SHA-512 for stronger integrity checks. (CWE-327: Use of a Broken or Risky Cryptographic Algorithm)"
+for _TEST_DOC in $(find ${_TEST_ROOT_DIR} \( -not -ipath "*.github/*" \) -a \( -iname '*.py' -o -iname '*.txt' -o -iname '*.md' \) -a -print0 2>&1 | xargs -0 -I{} ${_TEST_FILE_VALIDATOR} "{}" ; wait ;) ; do
+	if [[ ($(grep -cF 'Disclaimer' "${_TEST_DOC}" 2>&1 || : ;) -ne 0) ]] ; then
+		printf "%s\n" "SKIP: ${_TEST_DOC} is disclaimed." ;
+		EXIT_CODE=126;
+	else
+		if [[ ($(grep -cF "Copyright" "${_TEST_DOC}" 2>&1 || : ;) -le 0) ]] ; then
+			printf "%s\n" "FAIL: ${_TEST_DOC} is missing a copyright line" >&2 ;
+			EXIT_CODE=127
 		fi
-		if [[ ( -r test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig ) ]] ; then
-			# configure your CI evironment to trust the key at gpg --keyserver  keys.openpgp.org --recv-keys 9BD9E2DD46DA965A537E5B0A5CBF320243B6FD85
-			# FP: KEY FP 9BD9 E2DD 46DA 965A 537E  5B0A 5CBF 3202 43B6 FD85
-			# OR...
-			# Set CI=true to continue on missing keys
-			gpg --verify test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || ${CI} || EXIT_CODE=126
-			rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i}.sig 2>/dev/null ;
+		if [[ ( $(grep -F "Copyright" "${_TEST_DOC}" 2>&1 | grep -coF "Copyright (c)" 2>&1) -le 0) ]] ; then
+			printf "%s\n" "SKIP: ${_TEST_DOC} is missing a valid copyright line begining with \"Copyright (c)\"" ;
 		fi
-		shasum -a $i -c --ignore-missing test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} || EXIT_CODE=126
-		rm -vf test-reporter-latest-${CI_OS:-linux}-amd64.sha${i} 2>/dev/null ;
+		if [[ ( $(grep -F "Copyright (c)" "${_TEST_DOC}" 2>&1 | grep -oE "\d+(-\d+)?" 2>&1 | grep -oE "\d{3,}$" | sort -n | tail -n1) -lt ${_TEST_YEAR}) ]] ; then
+			printf "%s\n" "WARN: ${_TEST_DOC} is out of date without a current copyright (year)" >&2 ;
+		fi
+		if [[ ( ${EXIT_CODE} -ne 0 ) ]] ; then
+			case "$EXIT_CODE" in
+				0|126) true ;;
+				*) printf "%s\n" "SKIP: Unclassified issue with '${_TEST_DOC}'" ;;
+			esac
+		fi
 	fi
 done
 
-if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	mv -f test-reporter-latest-${CI_OS:-linux}-amd64 ./cc-test-reporter 2>/dev/null || EXIT_CODE=126
-	chmod -v 751 ./cc-test-reporter || EXIT_CODE=126
-fi
-
-if [[ ( ${EXIT_CODE} -eq 0 ) ]] ; then
-	./cc-test-reporter before-build || EXIT_CODE=10 ;
-fi
-
-
 unset _TEST_ROOT_DIR 2>/dev/null || true ;
+unset _TEST_DOC 2>/dev/null || true ;
+unset _TEST_YEAR 2>/dev/null || true ;
 
-cleanup 2>/dev/null || rm -f "${LOCK_FILE}" 2>/dev/null > /dev/null || true ; wait ;
+rm -f ${LOCK_FILE} 2>/dev/null > /dev/null || true ; wait ;
 
 # goodbye
 exit ${EXIT_CODE:-255} ;

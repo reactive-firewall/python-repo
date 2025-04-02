@@ -4,6 +4,8 @@ on:
     branches:
       - master
       - stable
+      - patch*
+      - feature*
     tags:
       - v*
   pull_request:
@@ -11,7 +13,6 @@ on:
       - opened
       - edited
       - reopened
-      - synchronize
       - ready_for_review
 
 # Declare default permissions as read only.
@@ -28,6 +29,9 @@ jobs:
       LANG: "en_US.UTF-8"
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - uses: actions/setup-python@v5
       with:
         python-version: "3.12"
@@ -43,7 +47,7 @@ jobs:
 
 
   BOOTSTRAP:
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
     defaults:
@@ -54,22 +58,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
         lang-var: ["de.utf-8", "jp.utf-8"]
         experimental: [true]
         include:
-          - python-version: 3.7
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: 3.8
-            lang-var: "en_US.utf-8"
-            experimental: false
-          - python-version: 3.9
-            lang-var: "de.utf-8"
-            experimental: false
-          - python-version: 3.9
-            lang-var: "jp.utf-8"
-            experimental: false
           - python-version: 3.9
             lang-var: "en_US.utf-8"
             experimental: false
@@ -87,13 +79,16 @@ jobs:
       LANG: ${{ matrix.lang-var }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup dependencies
       run: |
-        python -m pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37"
+        python -m pip install --upgrade "pip>=24.3.1" "setuptools>=45.0" "wheel>=0.37"
         pip install -r ./requirements.txt
         pip install -r ./test-requirements.txt || true
     - name: Pre-build
@@ -126,12 +121,12 @@ jobs:
       run: |
         make -j1 -f Makefile purge || true ;
         make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
       shell: bash
 
 
   MATS:
-    if: ${{ always() }}
+    if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
     defaults:
@@ -140,12 +135,15 @@ jobs:
     timeout-minutes: 10
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9, "3.10", "3.11", "3.12"]
+        python-version: ["3.9.21", "3.10", "3.11", "3.12"]
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
@@ -169,18 +167,20 @@ jobs:
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
-
-  COVERAGE-MATS:
+  COVERAGE:
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
     timeout-minutes: 10
     strategy:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        python-version: ["3.11", "3.12"]
+        python-version: ["3.9", "3.10", "3.11", "3.12"]
     env:
       OS: ${{ matrix.os }}
       PYTHON_VERSION: ${{ matrix.python-version }}
@@ -188,37 +188,40 @@ jobs:
       COVERAGE_RCFILE: ./.coveragerc
       COV_CORE_SOURCE: ./
       COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: ./coverage.xml
+      COV_CORE_DATAFILE: ./coverage.xml\
+      DEEPSOURCE_DSN: ${{ secrets.DEEPSOURCE_DSN }}
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os == 'Windows' }}
+      run: python -m pip install --upgrade pip
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37"
-        pip install -r ./requirements.txt
-        pip install -r ./test-requirements.txt || true
-    - name: Install code-climate tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} != "Linux"
       shell: bash
-      run: if [ "$OS" == "macos-latest" ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
-    - name: Install deepsource tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
-      shell: bash
-      run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
+      run: make -f Makefile test-reqs ;
     - name: Pre-Clean
       id: clean
+      shell: bash
       run: make -j1 -f Makefile clean || true ;
+    - name: Install code-climate tools for ${{ matrix.python-version }}
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      shell: bash
+      run: ./tests/fetch-test-reporter || true ;
     - name: Generate Coverage for py3.9 on ${{ matrix.os }}
-      if: ${{ runner.python-version }} == "3.9"
+      if: ${{ matrix.python-version == '3.9' }}
+      shell: bash
       run: make -f Makefile test ;
     - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ runner.python-version }} != "3.9"
+      if: ${{ matrix.python-version != '3.9' }}
+      shell: bash
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
       uses: codecov/codecov-action@v5
@@ -237,98 +240,20 @@ jobs:
         path: ./test-reports/
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }}
-      if: ${{ runner.os }} != "Linux"
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       run: |
-        if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+        ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: deepsource for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
       shell: bash
       run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
+        ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ;
     - name: Post-Clean
       id: post
+      shell: bash
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
-
-  COVERAGE:
-    if: ${{ success() }}
-    needs: [BUILD, MATS, COVERAGE-MATS]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 10
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macos-13, windows-latest]
-        python-version: [3.7, 3.8, 3.9, "3.10"]
-    env:
-      OS: ${{ matrix.os }}
-      PYTHON_VERSION: ${{ matrix.python-version }}
-      LANG: "en_US.utf-8"
-      COVERAGE_RCFILE: ./.coveragerc
-      COV_CORE_SOURCE: ./
-      COV_CORE_CONFIG: ./.coveragerc
-      COV_CORE_DATAFILE: ./coverage.xml
-      CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
-      CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" ;
-        pip install -r ./requirements.txt ;
-        pip install -r ./test-requirements.txt || true ;
-    - name: Install code-climate tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
-      shell: bash
-      run: if [ "$OS" == "ubuntu-latest" ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
-    - name: Install deepsource tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
-      shell: bash
-      run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then (curl https://deepsource.io/cli | sh) || true ; else echo "SKIP deepsource" ; fi ;
-    - name: Pre-Clean
-      id: clean
-      run: make -j1 -f Makefile clean || true ;
-    - name: Generate Coverage for py3.9 on ${{ matrix.os }}
-      if: ${{ runner.python-version }} == "3.9"
-      run: make -f Makefile test ;
-    - name: Generate Coverage for py${{ matrix.python-version }} on ${{ matrix.os }}
-      if: ${{ runner.python-version }} != "3.9"
-      run: make -f Makefile test-pytest ;
-    - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v5
-      with:
-        token: ${{ secrets.CODECOV_TOKEN }}
-        files: ./coverage.xml
-        directory: .
-        flags: ${{ matrix.os }},${{ matrix.python-version }}
-        name: pythonrepo-github-${{ matrix.os }}-${{ matrix.python-version }}
-        verbose: true
-        fail_ci_if_error: false
-    - name: Upload Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
-        path: ./test-reports/
-        if-no-files-found: ignore
-    - name: code-climate for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
-      shell: bash
-      run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
-    - name: deepsource for ${{ matrix.python-version }}
-      if: ${{ runner.os }} == "Linux"
-      shell: bash
-      run: |
-        if [ "$OS" == "ubuntu-latest" ] ; then ./bin/deepsource report --analyzer test-coverage --key python --value-file ./coverage.xml 2>/dev/null || true ; else echo "SKIP deepsource" ; fi ;
-    - name: Post-Clean
-      id: post
-      run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
   STYLE:
     if: ${{ success() }}
@@ -337,20 +262,21 @@ jobs:
     timeout-minutes: 10
 
     env:
-      PYTHON_VERSION: '3.10'
+      PYTHON_VERSION: '3.12'
       LANG: "en_US.utf-8"
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
     - name: Install dependencies for python Linters
-      run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" ;
-        pip install -r ./requirements.txt ;
-        pip install -r ./test-requirements.txt || true ;
+      shell: bash
+      run: make -f Makefile test-reqs || true ;
     - name: Pre-Clean
       id: clean
       run: make -j1 -f Makefile clean || true ;
@@ -361,7 +287,7 @@ jobs:
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
 
   INTEGRATION:
@@ -386,23 +312,26 @@ jobs:
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - name: Setup Python ${{ matrix.python-version }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
-      run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" ;
-        pip install -r ./requirements.txt ;
-        pip install -r ./test-requirements.txt || true ;
-    - name: Install code-climate tools for ${{ matrix.python-version }}
-      if: ${{ runner.os }} != "Linux"
-      run: if [ $OS == macos-latest ] ; then ./tests/fetch_cc-test-reporter || true ; fi ;
+      shell: bash
+      run: make -f Makefile test-reqs ;
+    - name: Install code-climate tools for ${{ matrix.python-version }} on ${{ matrix.os }}
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
+      run: if [ $OS == macos-latest ] ; then ./tests/fetch-test-reporter || true ; fi ;
       shell: bash
     - name: Pre-Clean
       id: clean-prep
+      shell: bash
       run: make -j1 -f Makefile clean ;
     - name: Pre-build for Python ${{ matrix.python-version }} on ${{ matrix.os }}
+      shell: bash
       run: make -j1 -f Makefile build ;
       if: ${{ success() }}
     - name: Pre-install for Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -430,17 +359,17 @@ jobs:
         path: ./test-reports/
         if-no-files-found: ignore
     - name: code-climate for ${{ matrix.python-version }}
-      if: ${{ runner.os }} != "Linux"
+      if: ${{ !cancelled() && runner.os != 'Windows' }}
       run: |
-        if [ "$OS" == "macos-latest" ] ; then ./cc-test-reporter after-build --exit-code 0 || true ; else echo "SKIP code climate" ; fi ;
+        ./cc-test-reporter after-build --exit-code 0 || true ;
     - name: Post-purge
       id: post-uninstall
       run: make -j1 -f Makefile purge || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
     - name: Post-Clean
       id: post-z-end
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}
 
 
   TOX:
@@ -450,18 +379,21 @@ jobs:
     timeout-minutes: 30
 
     env:
-      PYTHON_VERSION: '3.10'
+      PYTHON_VERSION: '3.12'
       LANG: 'en_US.utf-8'
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        submodules: true
+        persist-credentials: false
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
-        python-version: "3.10"
+        python-version: "3.12"
     - name: Install dependencies for Tox
       run: |
-        pip install --upgrade "pip>=21.0" "setuptools>=45.0" "wheel>=0.37" "tox>=3.0";
+        pip install --upgrade "pip>=24.3.1" "setuptools>=45.0" "wheel>=0.37" "tox>=3.0";
         pip install -r ./requirements.txt ;
         pip install -r ./test-requirements.txt || true ;
     - name: Pre-Clean
@@ -472,4 +404,4 @@ jobs:
     - name: Post-Clean
       id: post
       run: make -j1 -f Makefile clean || true ;
-      if: ${{ always() }}
+      if: ${{ !cancelled() }}

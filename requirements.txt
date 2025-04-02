@@ -4,18 +4,21 @@
 # subprocess - PSF licence
 # sphinx
 # argparse - builtin - PSF licence
-argparse>=1.4.0
-# argparse - builtin - PSF licence
-setuptools>=38.0
-# virtualenv - MIT
-virtualenv>=15.0.1
 # six - MIT
 six>=1.0.0
 # pgpy - BSD 3-Clause licensed
 #pgpy>=0.4.1
 tox>=3.0.0
 #py>=1.4.33
-pip>=19.0
+# setuptools - MIT license
+setuptools>=75.0
+# virtualenv - MIT license
+virtualenv>=20.26.6
+# pip - MIT license
+pip>=24.3.1
+# build - MIT license
+build>=1.1.1, !=1.2.2.post1
 # python-repo - MIT
 #-e git+https://github.com/reactive-firewall/python-repo.git#egg=python-repo
-
+# wheel - MIT license
+wheel>=0.44

@@ -113,7 +113,7 @@ def checkPythonErrors(args=None, stderr=None):
 		taintArgs = buildPythonCommand(args)
 		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
 		if isinstance(theOutput, bytes):
-			# default to utf8 your milage may vary
+			# default to utf8 your mileage may vary
 			theOutput = theOutput.decode('utf8')
 	except Exception as err:
 		theOutput = None

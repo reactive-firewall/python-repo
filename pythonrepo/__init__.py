@@ -30,7 +30,7 @@ __version__ = """1.1.5"""
 try:
 	import sys
 	import os
-	if str(__module__) in __file__:
+	if str(__module__) in __file__:  # pragma: no branch
 		__parentPath = os.path.join(
 			os.path.dirname(__file__), '..'
 		)

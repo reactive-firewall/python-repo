@@ -55,7 +55,7 @@ source_suffix = {
 	'.rst': 'restructuredtext',
 }
 
-# The encoding of source files. Official sphinx docs reccomend utf-8-sig.
+# The encoding of source files. Official sphinx docs recommend utf-8-sig.
 source_encoding = 'utf-8-sig'
 
 # The master toctree document.

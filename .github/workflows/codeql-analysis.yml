@@ -72,7 +72,7 @@ jobs:
     #   make bootstrap
     #   make release
     - name: Flake8 Scan
-      uses: reactive-firewall/flake8-cq@5a4f0f0e90a5c94b3f0fa1e659f2ec565b76be35  # v1.6a0
+      uses: reactive-firewall/flake8-cq@cfe54a7621fbb7290a68d1097e8e63532cb5e57d  # v1.6a2
       with:  # optional arguments
         config: '.flake8.ini'
         match: '**/*.py'

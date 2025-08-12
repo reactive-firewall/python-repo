@@ -28,7 +28,7 @@ jobs:
     env:
       LANG: "en_US.UTF-8"
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false
@@ -78,7 +78,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: ${{ matrix.lang-var }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false
@@ -140,7 +140,7 @@ jobs:
       PYTHON_VERSION: ${{ matrix.python-version }}
       LANG: "en_US.utf-8"
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false
@@ -193,7 +193,7 @@ jobs:
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false
@@ -266,7 +266,7 @@ jobs:
       LANG: "en_US.utf-8"
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false
@@ -311,7 +311,7 @@ jobs:
       CODECLIMATE_REPO_TOKEN: ${{ secrets.CODECLIMATE_TOKEN }}
       CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false
@@ -383,7 +383,7 @@ jobs:
       LANG: 'en_US.utf-8'
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
       with:
         submodules: true
         persist-credentials: false

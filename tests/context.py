@@ -17,13 +17,12 @@
 # limitations under the License.
 
 
-__module__ = """tests.context"""
+__module__ = """tests"""
 """This is pythonrepo testing module Template."""
 
 
-__module__ = """tests"""
+__name__ = f"""{module}.context"""  # skipcq: PYL-W0622
 
-__name__ = """tests.context"""  # skipcq: PYL-W0622
 
 __doc__ = """
 
@@ -66,6 +65,7 @@ try:
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] OS Failed to import.") from err
 
+
 try:
 	if 'tests.profiling' not in sys.modules:
 		import tests.profiling as profiling
@@ -73,6 +73,7 @@ try:
 		profiling = sys.modules["""tests.profiling"""]
 except ImportError as err:  # pragma: no branch
 	raise ModuleNotFoundError("[CWE-440] profiling Failed to import.") from err
+
 
 try:
 	import pythonrepo as pythonrepo  # skipcq: PYL-C0414

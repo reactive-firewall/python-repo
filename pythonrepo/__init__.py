@@ -3,13 +3,13 @@
 
 # Python Repo Template
 # ..................................
-# Copyright (c) 2017-2024, Kendrick Walls
+# Copyright (c) 2017-2025, Mr. Walls
 # ..................................
 # Licensed under MIT (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 # ..........................................
-# http://www.github.com/reactive-firewall/python-repo/LICENSE.md
+# https://github.com/reactive-firewall/python-repo/LICENSE.md
 # ..........................................
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,25 +19,26 @@
 
 """Python Repo."""
 
-__module__ = """pythonrepo"""
+__module__: str = """pythonrepo"""
 """This is pythonrepo module Template."""
 
 
-__version__ = """1.1.5"""
-"""This is version 1.1.5 of pythonrepo Template"""
+__version__: str = """2.0.0"""
+"""This is version 2.0.0 of pythonrepo Template"""
 
 
 try:
 	import sys
 	import os
 	if str(__module__) in __file__:  # pragma: no branch
-		__parentPath = os.path.join(
-			os.path.dirname(__file__), '..'
+		__parentPath: str = os.path.join(
+			os.path.dirname(__file__), "..",
 		)
-		sys.path.insert(0, os.path.abspath(__parentPath))
-except Exception as err:
+		if str(os.path.abspath(__parentPath)) not in sys.path:  # pragma: no branch
+			sys.path.insert(0, os.path.abspath(__parentPath))
+except ImportError as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__
 	baton.path = __file__
 	baton.__cause__ = err
-	raise baton
+	raise baton from err

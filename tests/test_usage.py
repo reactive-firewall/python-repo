@@ -23,76 +23,10 @@ import subprocess
 import sys
 import tests.profiling as profiling
 
-
-def getPythonCommand():
-	"""Function for backend python command with cross-python coverage support."""
-	thepython = "exit 1 ; #"
-	try:
-		thepython = checkPythonCommand(["which", "coverage"])
-		if (str("/coverage") in str(thepython)) and (sys.version_info >= (3, 3)):
-			thepython = str("coverage run -p")
-		elif (str("/coverage") in str(thepython)) and (sys.version_info <= (3, 2)):
-			try:
-				import coverage
-				if coverage.__name__ is not None:
-					thepython = str("{} -m coverage run -p").format(str(sys.executable))
-				else:
-					thepython = str(sys.executable)
-			except Exception:
-				thepython = str(sys.executable)
-		else:
-			thepython = str(sys.executable)
-	except Exception:
-		thepython = "exit 1 ; #"
-		try:
-			thepython = str(sys.executable)
-		except Exception:
-			thepython = "exit 1 ; #"
-	return str(thepython)
-
-
-def buildPythonCommand(args=None):
-	"""Function for building backend subprocess command line."""
-	theArgs = args
-	# you need to change this to the name of your project
-	__project__ = str("pythonrepo")
-	try:
-		if args is None or (args == [None]):
-			theArgs = ["exit 1 ; #"]
-		else:
-			theArgs = args
-		if str("coverage ") in str(theArgs[0]):
-			if str("{} -m coverage ").format(str(sys.executable)) in str(theArgs[0]):
-				theArgs[0] = str(sys.executable)
-				theArgs.insert(1, str("-m"))
-				theArgs.insert(2, str("coverage"))
-				theArgs.insert(3, str("run"))
-				theArgs.insert(4, str("-p"))
-				theArgs.insert(4, str("--source={}").format(__project__))
-			else:
-				theArgs[0] = str("coverage")
-				theArgs.insert(1, str("run"))
-				theArgs.insert(2, str("-p"))
-				theArgs.insert(2, str("--source={}").format(__project__))
-	except Exception:
-		theArgs = ["exit 1 ; #"]
-	return theArgs
-
-
-def checkPythonCommand(args=None, stderr=None):
-	"""Function for backend subprocess check_output command like testing with coverage support."""
-	theOutput = None
-	try:
-		taintArgs = buildPythonCommand(args)
-		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
-	except Exception:
-		theOutput = None
-	try:
-		if isinstance(theOutput, bytes):
-			theOutput = theOutput.decode('utf8')
-	except UnicodeDecodeError:
-		theOutput = bytes(theOutput)
-	return theOutput
+from tests.context import (
+	getPythonCommand,
+	checkPythonCommand,
+)
 
 
 @profiling.do_cprofile
@@ -104,21 +38,6 @@ def timePythonCommand(args=None, stderr=None):
 	if args is None:
 		args = [None]
 	return checkPythonCommand(args, stderr)
-
-
-def checkPythonErrors(args=None, stderr=None):
-	"""Function like checkPythonCommand, but with error passing."""
-	theOutput = None
-	try:
-		taintArgs = buildPythonCommand(args)
-		theOutput = subprocess.check_output(taintArgs, stderr=stderr)
-		if isinstance(theOutput, bytes):
-			# default to utf8 your mileage may vary
-			theOutput = theOutput.decode('utf8')
-	except Exception as err:
-		theOutput = None
-		raise RuntimeError(err)
-	return theOutput
 
 
 def debugBlob(blob=None):
@@ -143,7 +62,7 @@ def debugBlob(blob=None):
 def debugIfNoneResult(thepython, theArgs, theOutput):
 	"""In case you need it."""
 	try:
-		if (str(theOutput) is not None):
+		if not (str(theOutput) is None or str(theOutput) == str(None)):
 			theResult = True
 		else:
 			theResult = False
@@ -208,14 +127,11 @@ class BasicUsageTestSuite(unittest.TestCase):
 						theOutputtext = str(repr(bytes(theOutputtext)))
 					# ADD REAL VERSION TEST HERE
 					theResult = debugIfNoneResult(thepython, args, theOutputtext)
+					self.assertTrue(theResult)
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				self.fail(err)
 				err = None
 				del err  # skipcq: PTC-W0043
 				theResult = False
@@ -249,11 +165,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				self.fail(err)
 				err = None
 				del err  # skipcq: PTC-W0043
 				theResult = False
@@ -261,7 +173,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 
 	@unittest.expectedFailure
 	def test_fail_template_case(self):
-		"""Test case template for profiling."""
+		"""Test case template for profiling with an expected failure."""
 		theResult = False
 		thepython = getPythonCommand()
 		if (thepython is not None):
@@ -284,21 +196,16 @@ class BasicUsageTestSuite(unittest.TestCase):
 							theOutputtext = theOutputtext.decode('utf8')
 					except UnicodeDecodeError:
 						theOutputtext = str(repr(bytes(theOutputtext)))
-					theResult = debugIfNoneResult(thepython, args, theOutputtext)
+					theResult = not debugIfNoneResult(thepython, args, theOutputtext)
 					# or simply:
-					self.assertIsNotNone(theOutputtext)
+					self.assertIsNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				self.fail(err)
 				err = None
 				del err  # skipcq: PTC-W0043
 				theResult = False
 		self.assertTrue(theResult)
 
-	@unittest.expectedFailure
 	def test_bad_template_case(self):
 		"""Test case template for profiling."""
 		theResult = False
@@ -327,11 +234,7 @@ class BasicUsageTestSuite(unittest.TestCase):
 					# or simply:
 					self.assertIsNotNone(theOutputtext)
 			except Exception as err:
-				print(str(""))
-				print(str(type(err)))
-				print(str(err))
-				print(str((err.args)))
-				print(str(""))
+				self.fail(err)
 				err = None
 				del err  # skipcq: PTC-W0043
 				theResult = False

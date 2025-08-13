@@ -33,7 +33,7 @@ commands:
 parameters:
   python-version:
     type: string
-    default: "3.12"
+    default: "3.13"
 
 jobs:
   build:

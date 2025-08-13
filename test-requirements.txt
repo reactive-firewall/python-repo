@@ -13,25 +13,32 @@ tox>=3.0.0
 setuptools>=75.0
 # virtualenv - MIT license
 virtualenv>=20.26.6
-# pip - MIT license
-pip>=24.3.1
 # build - MIT license
 build>=1.1.1, !=1.2.2.post1
-# python-repo - MIT
-#-e git+https://github.com/reactive-firewall/python-repo.git#egg=python-repo
 # wheel - MIT license
-wheel>=0.44
+wheel>=0.45
+# pip - MIT license
+pip>=25.1.1
 #
 # TESTING ONLY - Do NOT report issues with these optionals on python-repo
 #
-flake8>=5.0
-pyflakes>=2.5.0
-pep8>=1.0
-pytest>=7
-pytest-checkdocs>=2.4
-pytest-cov>=4.0.0
+# flake8 - MIT license
+flake8>=7.2.0
+# flake8-comprehensions - MIT License
+flake8-comprehensions>=3.16.0
+# pyflakes - MIT license
+# pyflakes>=3.3.2
+# pep8 - MIT license
+pep8>=1.7
+# pytest - MIT license
+pytest>=7.0, !=8.1.0
+# pytest-doctestplus - BSD license
+pytest-doctestplus>=1.4.0
+# pytest-cov - MIT license
+pytest-cov>=6.1.1
+# pytest-enabler - MIT license
 pytest-enabler>=1.0.1
-pytest-flake8>=1.0
-coverage >= 6.3
-pytest-cov >= 4.0.0;
-pytest-enabler >= 1.0.1
+# pytest-flake8 - BSD license - removed from tests in v2.0.9a3
+# pytest-flake8>=1.0.7
+# coverage - Apache 2.0 license
+coverage>=7.2

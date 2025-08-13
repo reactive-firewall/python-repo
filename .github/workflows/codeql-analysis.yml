@@ -13,7 +13,7 @@ name: "CodeQL"
 
 on:
   push:
-    branches: [ master, stable ]
+    branches: [ master, stable, feature-flake8-87 ]
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ stable ]
@@ -21,7 +21,7 @@ on:
     - cron: '17 5 * * 1'
 
 # Declare default permissions as read only.
-permissions: read-all
+permissions: {}
 
 jobs:
   analyze:
@@ -71,6 +71,13 @@ jobs:
     #- run: |
     #   make bootstrap
     #   make release
+    - name: Flake8 Scan
+      uses: reactive-firewall/flake8-cq@v2  # v2.0
+      with:  # optional arguments
+        config: '.flake8.ini'
+        match: '**/*.py'
+        publish-artifacts: false
+      if: ${{ success() }}
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3

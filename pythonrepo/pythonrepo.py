@@ -18,7 +18,7 @@
 # limitations under the License.
 
 
-__module__ = """pythonrepo.pythonrepo"""
+__module__: str = """pythonrepo.pythonrepo"""
 """This is pythonrepo component Template."""
 
 
@@ -32,23 +32,23 @@ except Exception as err:
 	baton.path = __file__
 	baton.__cause__ = err
 	# Throw more relevant Error
-	raise baton
+	raise baton from err
 
 
 from . import __version__
 
 
-__prog__ = str(__module__)
+__prog__: str = str(__module__)
 """The name of this program is PythonRepo"""
 
 
-__description__ = str(
+__description__: str = str(
 	"""Add a Description Here"""
 )
 """Contains the description of the program."""
 
 
-__epilog__ = str(
+__epilog__: str = str(
 	"""Add an epilog here."""
 )
 """Contains the short epilog of the program CLI help text."""
@@ -57,7 +57,7 @@ __epilog__ = str(
 # Add your functions here
 
 
-def NoOp(*args, **kwargs):
+def NoOp(*args, **kwargs) -> None:
 	"""The meaning of Nothing."""
 	return None
 
@@ -65,38 +65,42 @@ def NoOp(*args, **kwargs):
 # More boiler-plate-code
 
 
-TASK_OPTIONS = {  # skipcq: PTC-W0020
-	'noop': NoOp
+TASK_OPTIONS: dict = {  # skipcq: PTC-W0020
+	"noop": NoOp,
 }
 """The callable function tasks of this program."""
 
 
-def parseArgs(arguments=None):
-	"""Parses the CLI arguments. See argparse.ArgumentParser for more.
-	param str - arguments - the array of arguments to parse.
-		Usually sys.argv[1:]
-	returns argparse.Namespace - the Namespace parsed with
+def parseArgs(arguments=None) -> tuple[argparse.Namespace, list[str]]:
+	"""Parses the CLI arguments.
+
+	See `argparse.ArgumentParser` for more.
+
+	Parameters:
+		arguments (list) - the array of arguments to parse.
+		Usually `sys.argv[1:]`.
+
+	Returns:
+		result (tuple(argparse.Namespace, list)) - the Namespace parsed with
 		the key-value pairs.
 	"""
-	parser = argparse.ArgumentParser(
+	parser: argparse.ArgumentParser = argparse.ArgumentParser(
 		prog=__prog__,
 		description=__description__,
-		epilog=__epilog__
+		epilog=__epilog__,
 	)
 	parser.add_argument(
-		'some_task', choices=TASK_OPTIONS.keys(),
-		help='the help text for this option.'
+		"some_task", choices=sorted(TASK_OPTIONS.keys()),
+		help="the help text for this option."
 	)
 	parser.add_argument(
-		'-V', '--version',
-		action='version', version=str(
-			"%(prog)s {version}"
-		).format(version=str(__version__))
+		"-V", "--version",
+		action="version", version=f"{parser.prog} {__version__}"
 	)
 	return parser.parse_known_args(arguments)
 
 
-def useTool(tool, *arguments):
+def useTool(tool, *arguments) -> any:
 	"""Handler for launching the functions."""
 	if (tool is not None) and (tool in TASK_OPTIONS):
 		try:
@@ -109,28 +113,28 @@ def useTool(tool, *arguments):
 		return None
 
 
-def main(*argv):
+def main(*argv) -> None:
 	"""The Main Event."""
 	try:
 		try:
 			args, extra = parseArgs(*argv)
 			service_cmd = args.some_task
 			useTool(service_cmd, extra)
-		except Exception:
+		except Exception as _cause:
 			w = str("WARNING - An error occurred while")
 			w += str("handling the arguments.")
 			w += str(" Cascading failure.")
 			print(w)
-			sys.exit(2)
-	except Exception:
+			raise SystemExit(2) from _cause
+	except BaseException as _panic:  # nocq
 		e = str("CRITICAL - An error occurred while handling")
-		e += str("the cascading failure.")
+		e += str(" the cascading failure.")
 		print(e)
-		sys.exit(3)
+		raise SystemExit(3) from _panic
 	sys.exit(0)
 
 
-if __name__ in '__main__':
+if __name__ == "__main__":
 	# deepsource overlooks the readability of "if main" type code here. (See PTC-W0048)
 	if (sys.argv is not None) and (len(sys.argv) >= 1):
 		main(sys.argv[1:])

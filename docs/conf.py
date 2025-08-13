@@ -11,68 +11,150 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
+"""Sphinx documentation configuration file.
+
+This module contains configuration settings for building the project's documentation
+using Sphinx. It sets up extensions, themes, and various build parameters.
+
+Attributes:
+	DOCS_BUILD_REF (str): The Git reference used in GitHub links, defaults to 'stable'.
+	needs_sphinx (str): Minimum required Sphinx version.
+	extensions (list): Sphinx extensions to be used.
+	autodoc2_packages (list): Packages to be documented using autodoc2.
+	project (str): Name of the project.
+	copyright (str): Copyright information.
+	version (str): Short X.Y version.
+	release (str): Full version including alpha/beta/rc tags.
+
+Example:
+	>>> import conf
+	>>> conf.project
+	'pythonrepo'
+	>>> conf.version
+	'2.0'
+"""
+
 import sys
 import os
 
 
+from urllib.parse import quote
+
+# If you have custom documentation extensions, add them here
+import docs.utils
+from docs.utils import (
+	_validate_git_ref,  # noqa
+	slugify_header,  # noqa
+	sanitize_url,  # noqa
+	sanitize_intersphinx_mapping  # noqa
+)
+
+# Define the branch reference for linkcode_resolve
+DOCS_BUILD_REF: str = _validate_git_ref(os.environ.get("DOCS_BUILD_REF", "HEAD"))
+"""
+The Git reference used in the GitHub links.
+Used by linkcode_resolve() to generate GitHub links. Accepts most git references
+(commit hash or branch name).
+Value:
+	str: The Git reference, defaults to 'HEAD' (latest) if DOCS_BUILD_REF environment
+		variable is not set.
+"""
+
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-sys.path.insert(0, os.path.abspath('../'))
-sys.path.insert(1, os.path.abspath('./pythonrepo'))
+
+sys.path.insert(0, os.path.abspath(".."))
+# sys.path.insert(1, os.path.abspath("tests"))  # uncomment to add tests docs
+sys.path.insert(1, os.path.abspath("pythonrepo"))
 
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.
-needs_sphinx = '5.3'
+needs_sphinx: str = "7.3"
 
-# Add any Sphinx extension module names here, as strings. They can be extensions
+# Add any Sphinx extension module names below, as strings. They can be extensions
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
-# for md us 'autodoc2' (pip install sphinx-autodoc2)
-# for rst use 'sphinx.ext.autodoc'
-extensions = [
-				'sphinx.ext.napoleon', 'autodoc2', 'sphinx.ext.autosummary',
-				'sphinx.ext.githubpages', 'myst_parser',
-				'sphinx.ext.doctest', 'sphinx.ext.todo',
-				'sphinx.ext.linkcode', 'sphinx.ext.viewcode'
-			]
 
-# for md auto-docs
+# Hints:
+# for GHF md try 'sphinx.ext.githubpages', 'sphinxcontrib.mermaid' and 'myst_parser'
+# (pip install 'sphinxcontrib-mermaid')
+# (pip install 'myst-parser[linkify]')
+# for reST ONLY projects, can disable 'myst_parser'
+# Auto-documenting
+# for md use 'autodoc2' (pip install sphinx-autodoc2)
+# for reST use 'sphinx.ext.autodoc'
+
+# Add any Sphinx extension module names here, as strings.
+# type-hint extensions: list[str]
+extensions = [
+	"sphinx.ext.napoleon",
+	"autodoc2",
+	"sphinx.ext.autosectionlabel",
+	"sphinx.ext.githubpages",
+	"sphinxcontrib.mermaid",
+	"myst_parser",
+	"sphinx_design",
+	"sphinx.ext.autosummary",
+	"sphinx.ext.doctest",
+	"sphinx.ext.todo",
+	"sphinx.ext.linkcode",
+	"sphinx.ext.viewcode",
+	"sphinx.ext.intersphinx",
+]
+
+# for md auto-docs (comment or remove to use default RST mode)
+# type-hint autodoc2_packages: list[str]
 autodoc2_packages = [
 	"pythonrepo",
 	"tests",
 ]
 
+# also for md auto-docs to use myst (comment or remove to use default RST mode)
+# type-hint autodoc2_render_plugin: str
 autodoc2_render_plugin = "myst"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+# type-hint source_suffix: list[str]
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
+# type-hint source_suffix: dict
 source_suffix = {
-	'.md': 'markdown',
-	'.txt': 'markdown',
-	'.rst': 'restructuredtext',
+	".yml": "yaml",
+	".toml": "toml",
+	".md": "markdown",
+	".txt": "markdown",
+	"Makefile": "makefile",
+	".rst": "restructuredtext",
 }
 
 # The encoding of source files. Official sphinx docs recommend utf-8-sig.
-source_encoding = 'utf-8-sig'
+# type-hint source_encoding: str
+source_encoding = "utf-8-sig"
 
 # The master toctree document.
-master_doc = 'toc'
+# type-hint master_doc: str
+master_doc = "toc"
 
 # General information about the project.
-project = u'python_template'
-copyright = u'2017-2024, reactive-firewall'
+# type-hint project: str
+project = "pythonrepo"
 
-# The version info for the project you're documenting, acts as replacement for
+# add the by-line or string for author(s) here
+authors: str = "reactive-firewall"
+
+# type-hint copyright: str
+copyright = f"2017-2025, {authors}"
+
+# The version info for the project yo"re documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = 'v2.0'
+version = "2.0"
 # The full version, including alpha/beta/rc tags.
-release = 'v2.0.0-alpha'
+release = f"v${version}.0b0"
 
 # The language for content autogenerated by Sphinx. Refer to documentation
 # for a list of supported languages.
@@ -83,11 +165,25 @@ release = 'v2.0.0-alpha'
 # today = ''
 # Else, today_fmt is used as the format for a strftime call.
 # today_fmt = '%B %d, %Y'
-today_fmt = '%Y.%B.%d'
+today_fmt = "%Y.%B.%d"
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
-exclude_patterns = ['_build', '.github', '.circleci', '.DS_Store', '**/.git', 'dist', 'tests']
+# type-hint exclude_patterns: list[str]
+exclude_patterns = [
+	"*~",
+	"www",
+	"dist",
+	"_build",
+	".github",
+	"**/docs",
+	"**/.git",
+	".DS_Store",
+	".circleci",
+	"codecov_env",
+	"../tests/tests/**",
+	f"../{project}/{project}/**",
+]
 
 # The reST default role (used for this markup: `text`) to use for all documents.
 # default_role = None
@@ -107,8 +203,35 @@ strip_signature_backslash = True
 show_authors = True
 
 # The name of the Pygments (syntax highlighting) style to use.
-# pygments_style = 'py'
-pygments_style = 'default'
+# pygments_style = "default"
+
+# For GHF md try these themes (pip install 'sphinxawesome-theme>=5.2')
+# pygments_style = "github"
+# and for dark-mode
+# pygments_style_dark = "github-dark"
+
+# and for improved highlighting, try these advanced highlighting settings:
+
+# pygments_options: dict = {
+# 	"tabsize": 4,
+# 	"stripall": False,
+# 	"encoding": "utf-8",
+# }
+
+# pygments_yaml_options: dict = {
+# 	"tabsize": 2,
+# 	"stripall": True,
+# 	"encoding": "utf-8",
+# }
+
+# highlight_options = {
+# 	"default": pygments_options,
+# 	"python": pygments_options,
+# 	"yaml": pygments_yaml_options,
+# 	"ini": pygments_yaml_options,
+# 	"makefile": pygments_options,
+# }
+
 
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
@@ -120,7 +243,8 @@ toc_object_entries = True
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'sphinxawesome_theme'
+# (pip install 'sphinxawesome-theme>=5.2')
+html_theme = "sphinxawesome_theme"
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -135,7 +259,7 @@ html_theme = 'sphinxawesome_theme'
 # html_title = None
 
 # A shorter title for the navigation bar.  Default is the same as html_title.
-html_short_title = 'Project Docs'
+html_short_title = "Project Docs"
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
@@ -146,16 +270,17 @@ html_short_title = 'Project Docs'
 # pixels large.
 # html_favicon = None
 
-html_permalinks_icon = '<span>#</span>'
+html_permalinks_icon = "<span>#</span>"
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
 # html_last_updated_fmt = '%b %d, %Y'
+html_last_updated_fmt = today_fmt.strip()
 
 # If true, SmartyPants will be used to convert quotes and dashes to
 # typographically correct entities.
@@ -172,7 +297,7 @@ html_static_path = ['_static']
 # html_domain_indices = True
 
 # If false, no index is generated.
-# html_use_index = True
+html_use_index = True
 
 # If true, the index is split into individual pages for each letter.
 # html_split_index = False
@@ -184,7 +309,7 @@ html_static_path = ['_static']
 # html_show_sphinx = True
 
 # If true, "(C) Copyright ..." is shown in the HTML footer. Default is True.
-# html_show_copyright = True
+html_show_copyright = True
 
 # If true, an OpenSearch description file will be output, and all pages will
 # contain a <link> tag referring to it.  The value of this option must be the
@@ -195,25 +320,70 @@ html_static_path = ['_static']
 # html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'python_repo_doc'
+htmlhelp_basename = "python_repo_doc"
 
+# -- Options for Mermaid diagrams -----------------------------------------------
+# see https://github.com/mgaitan/sphinxcontrib-mermaid?tab=readme-ov-file#markdown-support
+
+# GFM style mermaid use zoom
+mermaid_d3_zoom = True
+
+# Mermaid Diagram Themes
+mermaid_params = ["--theme", "default", "--backgroundColor", "transparent"]
+# for darkmode try:
+# mermaid_params = ["--theme", "dark", "--backgroundColor", "transparent"]
 
 # -- Options for MyST markdown parser -------------------------------------------
-# see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html#syntax-directives
+# see https://myst-parser.readthedocs.io/en/latest/syntax/roles-and-directives.html
 
 # be more like GFM with style
-myst_enable_extensions = ('tasklist', 'strikethrough', 'fieldlist')
+myst_enable_extensions = ("tasklist", "strikethrough", "fieldlist", "linkify")
 
 # for GFM diagrams and interoperability with other Markdown renderers
-myst_fence_as_directive = ('mermaid', 'suggestion', 'note')
+myst_fence_as_directive = ("mermaid", "suggestion", "note")
+
+# Add linkify configuration
+myst_linkify_fuzzy_links = False
 
 # Focus only on github markdown
+# NOTE: We keep myst_gfm_only = False because setting it to True
+# caused a regression where the 'toc.md' contents fence broke.
+# Re-enabling GitHub Flavored Markdown exclusively
+# should be approached with caution to avoid that issue.
 myst_gfm_only = False
 
+# html metadata for MyST content
+myst_html_meta = {
+	"github_url": sanitize_url(f"https://github.com/{authors}/{project}"),
+}
 
-#heading_anchors = 1
+# For GH-style admonitions to MyST conversion (still have to use directive with MyST)
+myst_admonition_aliases = {
+	"note": "note",
+	"warning": "warning",
+	"important": "important",
+	"tip": "tip",
+	"caution": "caution"
+}
+
+# how deep should markdown headers have anchors be generated
+heading_anchors = 3
+
+# Enable header anchors as requested
+myst_heading_anchors = 3
+
+# For better slug generation in header references (MUST be imported as above)
+myst_heading_slug_func = slugify_header
 
 # -- Options for napoleon ext --------------------------------------------------
+
+# also for GHF md try these
+napoleon_google_docstring = True
+napoleon_numpy_docstring = False
+
+# exclude 'private' when it has docstrings
+napoleon_include_private_with_doc = False
+napoleon_include_special_with_doc = False
 
 # include __init__ when it has docstrings
 napoleon_include_init_with_doc = True
@@ -237,13 +407,7 @@ latex_elements = {}
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-	(
-		u'index',
-		u'Documentation.tex',
-		u'python repo Template Documentation',
-		u'reactive-firewall',
-		u'manual'
-	),
+	("index", "Documentation.tex", f"{project} Documentation", f"{authors}", "manual"),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -271,15 +435,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-	(
-		u'index',
-		u'python_repo',
-		u'python_repo Template Documentation',
-		[u'reactive-firewall'],
-		1
-	)
-]
+man_pages = [("index", f"{project}", f"{project} Documentation", [f"{authors}"], 8)]
 
 # If true, show URL addresses after external links.
 # man_show_urls = False
@@ -292,13 +448,13 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
 	(
-		u'index',
-		u'Python Repo',
-		u'python_repo Template Documentation',
-		u'reactive-firewall',
-		u'python_repo Template',
-		u'python_repo Template.',
-		u'Miscellaneous'
+		"index",
+		f"{project}",
+		f"{project} Documentation",
+		f"{authors}",
+		f"{project}",
+		f"{project} Python Module.",
+		"Miscellaneous"
 	),
 ]
 
@@ -312,8 +468,80 @@ texinfo_documents = [
 # texinfo_show_urls = 'footnote'
 
 # -- Link resolver -------------------------------------------------------------
-def linkcode_resolve(domain, info):
-	if domain != 'py' or not info.get('module'):
+
+linkcode_url_prefix: str = sanitize_url(f"https://github.com/{authors}/{project}")
+
+suffix: str = "/issues/%s"
+
+extlinks: dict[str, tuple] = {
+	"issue": (
+		f"{linkcode_url_prefix}/{suffix}",
+		"issue #%s"
+	)
+}
+
+# try to link with official python3 documentation.
+# see https://www.sphinx-doc.org/en/master/usage/extensions/intersphinx.html for more
+intersphinx_mapping: dict[str, tuple] = sanitize_intersphinx_mapping(
+	{
+		"python": ("https://docs.python.org/3", (None, "python-inv.txt")),
+		"PEP": ("https://peps.python.org", (None, "pep-inv.txt")),
+	},
+)
+
+
+def linkcode_resolve(domain: any, info: any) -> str:
+	"""
+	Resolves selectively linking to GitHub source-code for the project module.
+
+	See https://www.sphinx-doc.org/en/master/usage/extensions/linkcode.html for more details.
+
+	Unit-Testing:
+
+		First set up test fixtures by importing conf.
+
+			>>> import docs.conf as _conf
+			>>>
+
+		Testcase 1: Test function with input.
+
+			>>> _conf.linkcode_resolve is not None
+			True
+			>>> test_text = "pythonrepo.env"  # this is resolved
+			>>> bad_input = False  # this is invalid
+			>>> res_text = _conf.linkcode_resolve("py", info={"module": test_text})
+			>>> res_text is not None
+			True
+			>>> type(res_text) is type(str())
+			True
+			>>> len(res_text) > 0
+			True
+			>>> res_text is not test_text
+			True
+			>>> _conf.linkcode_resolve("py", info={"module": test_text,}) == res_text
+			True
+			>>> _conf.linkcode_resolve("py", info={"module": bad_input,}) is None
+			True
+			>>> len(res_text) > 0
+			True
+			>>>
+			>>> # cleanup from unit-test
+			>>> del bad_input
+			>>> del test_text
+			>>> del res_text
+			>>>
+	"""
+	if not isinstance(domain, str) or domain != "py":
 		return None
-	filename = info['module'].replace('.', '/')
-	return "https://github.com/reactive-firewall/python-repo/blob/stable/%s.py" % filename
+	if not isinstance(info, dict) or "module" not in info or not info["module"]:
+		return None
+	if not isinstance(info["module"], str):
+		return None
+	filename = info["module"].replace(".", "/")
+	theResult = f"{linkcode_url_prefix}/blob/{DOCS_BUILD_REF}/{filename}.py"
+	if "/{project}.py" in theResult:
+		theResult = theResult.replace(f"/{project}.py", f"/{project}/__init__.py")
+	if "/tests.py" in theResult:
+		theResult = theResult.replace("/tests.py", "/tests/__init__.py")
+	return sanitize_url(quote(theResult, safe=":/-._"))
+

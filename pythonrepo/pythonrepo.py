@@ -71,7 +71,7 @@ TASK_OPTIONS: dict = {  # skipcq: PTC-W0020
 """The callable function tasks of this program."""
 
 
-def parseArgs(arguments=None) -> argparse.Namespace:
+def parseArgs(arguments=None) -> tuple[argparse.Namespace, list[str]]:
 	"""Parses the CLI arguments.
 
 	See `argparse.ArgumentParser` for more.

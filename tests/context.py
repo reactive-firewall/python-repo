@@ -461,7 +461,7 @@ def checkCovCommand(*args):  # skipcq: PYL-W0102  - [] != [None]
 	"""
 	if sys.__name__ is None:  # pragma: no branch
 		raise ImportError("[CWE-758] Failed to import system.") from None
-	if not args or args[0] is None:
+	if not args or args[0] is None:  # skipcq: PYL-R1720
 		# skipcq: TCV-002
 		raise ValueError("[CWE-1286] args must be an array of positional arguments") from None
 	else:

@@ -35,7 +35,7 @@ except Exception as err:
 	raise baton from err
 
 
-from . import __version__ as __version__  # noqa
+from . import __version__
 
 
 __prog__: str = str(__module__)

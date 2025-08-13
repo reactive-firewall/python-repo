@@ -100,7 +100,7 @@ def parseArgs(arguments=None) -> argparse.Namespace:
 	return parser.parse_known_args(arguments)
 
 
-def useTool(tool, *arguments) -> Any:
+def useTool(tool, *arguments) -> any:
 	"""Handler for launching the functions."""
 	if (tool is not None) and (tool in TASK_OPTIONS):
 		try:
@@ -128,7 +128,7 @@ def main(*argv) -> None:
 			raise SystemExit(2) from _cause
 	except BaseException as _panic:  # nocq
 		e = str("CRITICAL - An error occurred while handling")
-		e += str("the cascading failure.")
+		e += str(" the cascading failure.")
 		print(e)
 		raise SystemExit(3) from _panic
 	sys.exit(0)

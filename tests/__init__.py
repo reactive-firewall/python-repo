@@ -27,7 +27,7 @@ try:
 		import sys
 		import os
 		sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), str('..'))))
-	except (ImportError,OSError,TypeError,ValueError,AttributeError,IndexError) as ImportErr:
+	except (ImportError, OSError, TypeError, ValueError, AttributeError, IndexError) as ImportErr:
 		raise ImportError("[CWE-758] Test module failed completely.") from ImportErr
 	from tests import context as context  # skipcq: PYL-C0414
 	if not hasattr(context, '__name__') or not context.__name__:  # pragma: no branch

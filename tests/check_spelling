@@ -97,7 +97,7 @@ umask 137
 # force utf-8 for spelling
 export LC_CTYPE="${LC_CTYPE:-en_US.UTF-8}"
 
-LOCK_FILE="${TMPDIR:-/tmp}/org.pak.multicast.spell-check-shell"
+LOCK_FILE="${TMPDIR:-/tmp}/org.pak.pythonrepo.spell-check-shell"
 EXIT_CODE=1
 
 # Function to check if a command exists.

@@ -35,7 +35,7 @@ try:
 			os.path.dirname(__file__), "..",
 		)
 		if str(os.path.abspath(__parentPath)) not in sys.path:  # pragma: no branch
-			sys.path.insert(0, os.path.abspath(__parentPath))
+			sys.path.insert(0, os.path.abspath(__parentPath))  # pragma: no cover
 except ImportError as err:
 	baton = ImportError(err, str("[CWE-758] Module failed completely."))
 	baton.module = __module__

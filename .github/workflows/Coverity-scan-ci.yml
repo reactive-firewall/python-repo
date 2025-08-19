@@ -1,0 +1,117 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: CI Coverity Scan
+
+on:
+  push:
+    branches: [ "master", "stable", "patch-ci-coverity" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "**" ]
+  schedule:
+    - cron: '18 0 * * 4'
+
+jobs:
+  coverity-scan:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'  # Specify the Python version you need
+
+      - name: Download and Verify Coverity Tools
+        shell: bash
+        run: |
+          if [[ "${{ runner.os }}" == "Linux" ]]; then
+            curl -X POST "https://scan.coverity.com/download/other/linux64" \
+                 -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}&md5=1" \
+                 -o coverity_tool.tgz.md5
+            curl -X POST "https://scan.coverity.com/download/other/linux64" \
+                 -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" \
+                 -o coverity_tool.tgz
+            md5sum -c coverity_tool.tgz.md5
+          elif [[ "${{ runner.os }}" == "macOS" ]]; then
+            curl -X POST "https://scan.coverity.com/download/other/macOS" \
+                 -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}&md5=1" \
+                 -o coverity_tool.dmg.md5
+            curl -X POST "https://scan.coverity.com/download/other/macOS" \
+                 -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" \
+                 -o coverity_tool.dmg
+            md5 -r coverity_tool.dmg | awk '{print $1}' > coverity_tool.dmg.md5
+            diff coverity_tool.dmg.md5 coverity_tool.dmg.md5
+          elif [[ "${{ runner.os }}" == "Windows" ]]; then
+            curl -X POST "https://scan.coverity.com/download/other/windows" \
+                 -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}&md5=1" \
+                 -o coverity_tool.zip.md5
+            curl -X POST "https://scan.coverity.com/download/other/windows" \
+                 -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" \
+                 -o coverity_tool.zip
+            certutil -hashfile coverity_tool.zip MD5
+          fi
+
+      - name: Build and Scan Python Repository
+        run: |
+          cd path/to/python/repo
+          /path/to/cov-build --dir cov-int -- python setup.py build
+          coverity capture --dir cov-int --scm-branch ${{ github.ref }} --scm-revision ${{ github.sha }} --scm-url ${{ github.repository }} --project-dir ${{ github.workspace }} -- python setup.py build
+
+      - name: Create Metadata and Archive Results
+        run: |
+          echo "Name: $(git config user.name)" > README
+          echo "Email: $(git config user.email)" >> README
+          echo "Description: $(git log -1 --pretty=%B)" >> README
+          echo "Submitted-by: coverity-ci-auto-submit" >> README
+          ARCHIVE_NAME="${{ github.actor }}-${{ github.repository }}.tgz"
+          tar -czf "$ARCHIVE_NAME" cov-int README
+
+      - name: Submit the Archive to Coverity
+        shell: bash
+        run: |
+          BUILD_SIZE=$(du -b "$ARCHIVE_NAME" | cut -f1)
+          if [ "$BUILD_SIZE" -gt 500000000 ]; then
+              # Step 1: Initialize a build
+              curl -X POST \
+                -d version="1.0" \
+                -d project=${{ github.repository }} \
+                -d name=${{ github.actor }} \
+                -d description="Coverity scan submission" \
+                -d email=${{ secrets.COVERITY_EMAIL }} \
+                -d token=${{ secrets.COVERITY_TOKEN }} \
+                -d file_name="$ARCHIVE_NAME" \
+                "https://scan.coverity.com/projects/${{ secrets.COVERITY_PROJECT_ID }}/builds/init" \
+                | tee response
+
+              # Step 2: Store response data
+              upload_url=$(jq -r '.url' response)
+              build_id=$(jq -r '.build_id' response)
+
+              # Step 3: Upload the tarball to the Cloud
+              curl -X PUT \
+                --header 'Content-Type: application/json' \
+                --upload-file "$ARCHIVE_NAME" \
+                "${upload_url}"
+
+              # Step 4: Trigger the build on Scan
+              curl -X PUT \
+                -d token=${{ secrets.COVERITY_TOKEN }} \
+                "https://scan.coverity.com/projects/${{ secrets.COVERITY_PROJECT_ID }}/builds/${build_id}/enqueue"
+          else
+              # If the build size is within limits, submit directly
+              curl -X POST -F "file=@$ARCHIVE_NAME" \
+                -F "description='Coverity scan submission'" \
+                -F "project=${{ github.repository }}" \
+                -F "token=${{ secrets.COVERITY_TOKEN }}" \
+                -F "email=${{ secrets.COVERITY_EMAIL }}" \
+                "https://scan.coverity.com/builds"
+          fi

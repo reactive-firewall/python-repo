@@ -41,6 +41,7 @@ jobs:
                  -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" \
                  -o coverity_tool.tgz
             md5sum -c coverity_tool.tgz.md5
+            tar -xzf coverity_tool.tgz  # Extract the tools
           elif [[ "${{ runner.os }}" == "macOS" ]]; then
             curl -X POST "https://scan.coverity.com/download/other/macOS" \
                  -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}&md5=1" \
@@ -50,6 +51,13 @@ jobs:
                  -o coverity_tool.dmg
             md5 -r coverity_tool.dmg | awk '{print $1}' > coverity_tool.dmg.md5
             diff coverity_tool.dmg.md5 coverity_tool.dmg.md5
+
+            # Attach the dmg and extract the script
+            hdiutil attach coverity_tool.dmg
+            cp /Volumes/Coverity/cov-analysis-macosx-*.sh ./cov-analysis-macos.sh
+            chmod +x ./cov-analysis-macos.sh
+            ./cov-analysis-macos.sh  # Run the self-extracting script
+
           elif [[ "${{ runner.os }}" == "Windows" ]]; then
             curl -X POST "https://scan.coverity.com/download/other/windows" \
                  -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}&md5=1" \
@@ -58,13 +66,15 @@ jobs:
                  -d "token=${{ secrets.COVERITY_TOKEN }}&project=${{ github.repository }}" \
                  -o coverity_tool.zip
             certutil -hashfile coverity_tool.zip MD5
+            unzip coverity_tool.zip  # Extract the tools
           fi
+          ls -lap ./
 
       - name: Build and Scan Python Repository
         run: |
           cd path/to/python/repo
-          /path/to/cov-build --dir cov-int -- python setup.py build
-          coverity capture --dir cov-int --scm-branch ${{ github.ref }} --scm-revision ${{ github.sha }} --scm-url ${{ github.repository }} --project-dir ${{ github.workspace }} -- python setup.py build
+          /path/to/cov-build --dir cov-int -- make build
+          coverity capture --dir cov-int --scm-branch ${{ github.ref }} --scm-revision ${{ github.sha }} --scm-url ${{ github.repository }} --project-dir ${{ github.workspace }} -- make build
 
       - name: Create Metadata and Archive Results
         run: |

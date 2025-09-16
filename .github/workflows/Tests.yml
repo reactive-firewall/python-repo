@@ -32,7 +32,7 @@ jobs:
       with:
         submodules: true
         persist-credentials: false
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       with:
         python-version: "3.12"
     - name: Pre-Clean
@@ -83,7 +83,7 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Setup dependencies
@@ -145,7 +145,7 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for ${{ matrix.python-version }}
@@ -198,7 +198,7 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Fix braindead windows ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -271,7 +271,7 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.12"
     - name: Install dependencies for python Linters
@@ -316,7 +316,7 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Setup Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies for python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -388,7 +388,7 @@ jobs:
         submodules: true
         persist-credentials: false
     - name: Setup Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: "3.12"
     - name: Install dependencies for Tox

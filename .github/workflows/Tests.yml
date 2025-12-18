@@ -16,7 +16,11 @@ on:
       - ready_for_review
 
 # Declare default permissions as read only.
-permissions: read-all
+permissions:
+  contents: read  # for actions/checkout to fetch code
+  actions: read
+  pull-requests: read
+
 
 jobs:
   BUILD:

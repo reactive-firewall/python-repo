@@ -15,17 +15,19 @@ on:
       - reopened
       - ready_for_review
 
-# Declare default permissions as read only.
-permissions:
-  contents: read  # for actions/checkout to fetch code
-  actions: read
-  pull-requests: read
+# Declare default permissions as none.
+permissions: {}
 
 
 jobs:
   BUILD:
     if: github.repository == 'reactive-firewall/python-repo'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     defaults:
       run:
         shell: bash
@@ -54,6 +56,11 @@ jobs:
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     defaults:
       run:
         shell: bash
@@ -133,6 +140,11 @@ jobs:
     if: ${{ !cancelled() }}
     needs: BUILD
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     defaults:
       run:
         shell: bash
@@ -177,6 +189,11 @@ jobs:
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     defaults:
       run:
         shell: bash
@@ -263,6 +280,11 @@ jobs:
     if: ${{ success() }}
     needs: [BUILD, MATS]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     timeout-minutes: 10
 
     env:
@@ -298,6 +320,11 @@ jobs:
     if: ${{ success() }}
     needs: [MATS, COVERAGE]
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     timeout-minutes: 10
     strategy:
       matrix:
@@ -380,6 +407,11 @@ jobs:
     if: ${{ success() }}
     needs: [MATS, STYLE, COVERAGE, INTEGRATION]
     runs-on: ubuntu-latest
+    permissions:
+      contents: read  # for actions/checkout to fetch code
+      actions: read
+      pull-requests: read
+      statuses: write
     timeout-minutes: 30
 
     env:

@@ -234,7 +234,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v6.0.0
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
         name: Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/
@@ -353,7 +353,7 @@ jobs:
         verbose: true
         fail_ci_if_error: false
     - name: Upload Extra Python ${{ matrix.python-version }} Artifact
-      uses: actions/upload-artifact@v6.0.0
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f  # v6.0.0
       with:
         name: Integration-Test-Report-${{ matrix.os }}-${{ matrix.python-version }}
         path: ./test-reports/

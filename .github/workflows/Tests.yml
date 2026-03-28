@@ -245,7 +245,7 @@ jobs:
       shell: bash
       run: make -f Makefile test-pytest ;
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./coverage.xml
@@ -374,7 +374,7 @@ jobs:
         cp -vf ./coverage.xml ./test-reports/coverage.xml || true ;
       shell: bash
     - name: Upload Python ${{ matrix.python-version }} coverage to Codecov
-      uses: codecov/codecov-action@v5
+      uses: codecov/codecov-action@v6
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
         files: ./test-reports/coverage_supplement.xml
